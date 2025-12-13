@@ -1,0 +1,13 @@
+# env files
+.env
+client/client/.env
+server/.env
+
+# node modules
+node_modules/
+client/client/node_modules/
+server/node_modules/
+
+# build folders
+client/client/dist/
+client/client/build/
