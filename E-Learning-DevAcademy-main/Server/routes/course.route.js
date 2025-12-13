@@ -7,7 +7,8 @@ import upload from "../utils/multer.js";
 import { createOrder, getAllPurchasedCourses, getCourseDetailWithPurchaseStatus, verifyOrder } from "../controller/purchaseCourse.controller.js";
 import { instructorMiddleware } from "../middleware/instructorMiddleware.js";
 import { adminMiddleware } from "../middleware/adminMiddleware.js";
-import { adminDashboard, approveInstructor, manageCourses, manageUser, rejectInstructor } from "../controller/admin.controller.js";
+import { adminDashboard, approveInstructor, getMessages, manageCourses, manageUser, rejectInstructor, topCourses, topInstructors } from "../controller/admin.controller.js";
+import { optionalAuth } from "../middleware/optionalAuth.js";
 
 const router=express.Router();
 
@@ -15,8 +16,8 @@ router.route("/").post(isAuthenticated,createCourse);
 
 // public route
 router.route("/search").get(isAuthenticated,searchCourse)
-router.route("/published-courses").get(getPublishedCourses);
-router.route("/get-published-courses-on-level").get(getPublishedCourseForHome);
+router.route("/published-courses").get(optionalAuth,getPublishedCourses);
+router.route("/get-published-courses-on-level").get(optionalAuth,getPublishedCourseForHome);
 router.route("/getData-for-hero-section").get(getDataforHeroSection);
 router.route("/reviews").get(getreviews);
 router.route("/").get(isAuthenticated,getAllCreatorCourses);
@@ -78,7 +79,8 @@ router.route("/admin/manageUser").get(isAuthenticated,adminMiddleware,manageUser
 router.route("/admin/approve/:instructorId").put(isAuthenticated,adminMiddleware,approveInstructor);
 router.route("/admin/reject/:instructorId").put(isAuthenticated,adminMiddleware,rejectInstructor);
 router.route("/admin/manageCourses").get(isAuthenticated,adminMiddleware,manageCourses);
-
+router.route("/admin/top-courses").get(isAuthenticated,adminMiddleware,topCourses);
+router.route("/admin/top-instructors").get(isAuthenticated,adminMiddleware,topInstructors);
 
 
 export default router;

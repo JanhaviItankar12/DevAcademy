@@ -3,7 +3,9 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken.js";
 import { deleteMedia, uploadMedia } from "../utils/cloudinary.js";
 import { Course } from "../models/course.model.js";
-import {Certificate} from "../models/certificate.model.js";
+import { Certificate } from "../models/certificate.model.js";
+import { CourseProgress } from "../models/courseProgress.model.js";
+import { sendReplyEmail } from "../utils/sendEmail.js";
 
 
 
@@ -183,109 +185,215 @@ export const login = async (req, res) => {
 
 
 export const logout = async (_, res) => {
-    try {
-        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-            message: "Logged out Successfully",
-            success: true
+  try {
+    return res.status(200).cookie("token", "", { maxAge: 0 }).json({
+      message: "Logged out Successfully",
+      success: true
 
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to Logout"
-        });
-    }
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to Logout"
+    });
+  }
 }
 
 
-export const getUserProfile = async (req, res) => {
-    try {
-        const userId = req.id;
-        const user = await User.findById(userId).select("-password");
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Profile Not Found"
-            });
+//forogt-password
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-        }
-        return res.status(200).json({
-            success: true,
-            user
-        })
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
 
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to Load User"
+
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+
+    if (user.resetLastAttempt && now - user.resetLastAttempt < oneHour) {
+
+      if (user.resetAttempts >= 3) {
+        return res.status(429).json({
+          message:
+            "Too many reset password requests. Please try again after 1 hour.",
         });
+      }
+    } else {
+
+      user.resetAttempts = 0;
     }
+
+
+    user.resetAttempts += 1;
+    user.resetLastAttempt = now;
+    await user.save();
+
+
+    const token = generateResetToken(user._id);
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+
+    const resetLink = `${process.env.frontend_url}/reset-password/${token}`;
+    await sendForgotPasswordEmail(email, resetLink);
+
+    return res.json({ message: "Reset link sent to email" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    console.log("Reset Token From URL:", token);
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    // Strong password validation (allows ANY special character)
+    const strongPasswordRegex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+    if (!strongPasswordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and contain uppercase, lowercase, number, and a special character.",
+      });
+    }
+
+
+    // FIXED FIELD NAMES
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password reset successful. Please login again.",
+    });
+
+  } catch (error) {
+    console.log("Reset Password Error: ", error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+
+
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.id;
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile Not Found"
+      });
+
+    }
+    return res.status(200).json({
+      success: true,
+      user
+    })
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to Load User"
+    });
+  }
 }
 
 
 export const updateProfile = async (req, res) => {
-    try {
-        const userId = req.id;
-        const { name } = req.body;
-        const profilePhoto = req.file;
+  try {
+    const userId = req.id;
+    const { name } = req.body;
+    const profilePhoto = req.file;
 
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User Not Found"
-            });
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User Not Found"
+      });
 
-        }
-
-        const updatedData = {};
-        if (name) updatedData.name = name;
-
-        if (profilePhoto) {
-            const cloudResponse = await uploadMedia(profilePhoto.path);
-            updatedData.photoUrl = cloudResponse.secure_url;
-
-            //extract public id of old image from url if it exist
-            if (user.photoUrl) {
-                const publicId = user.photoUrl.split("/").pop().split(".")[0]  //extract public id
-                await deleteMedia(publicId);
-            }
-        }
-
-
-
-        //upload new photourl
-        const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true }).select("-password");
-        return res.status(200).json({
-            success: true,
-            user: updatedUser,
-            message: "Profile updated Successfully"
-        });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to Update Profile"
-        });
     }
+
+    const updatedData = {};
+    if (name) updatedData.name = name;
+
+    if (profilePhoto) {
+      const cloudResponse = await uploadMedia(profilePhoto.path);
+      updatedData.photoUrl = cloudResponse.secure_url;
+
+      //extract public id of old image from url if it exist
+      if (user.photoUrl) {
+        const publicId = user.photoUrl.split("/").pop().split(".")[0]  //extract public id
+        await deleteMedia(publicId);
+      }
+    }
+
+
+
+    //upload new photourl
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true }).select("-password");
+    return res.status(200).json({
+      success: true,
+      user: updatedUser,
+      message: "Profile updated Successfully"
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to Update Profile"
+    });
+  }
 }
 
 
 //get logged in user
 export const getCurrentUser = async (req, res) => {
-    try {
-        return res.status(201).json(
-            req.user,
-        )
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            message: "Failed to fetch current user data"
-        });
-    }
+  try {
+    return res.status(201).json(
+      req.user,
+    )
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Failed to fetch current user data"
+    });
+  }
 }
 
 
@@ -293,45 +401,71 @@ export const studentDashboardData = async (req, res) => {
   try {
     const userId = req.id;
 
+    //  Get user with enrolled courses & certificates
     const user = await User.findById(userId)
       .select("name email photoUrl enrolledCourses certificates")
       .populate({
         path: "enrolledCourses",
         populate: [
           { path: "creator", select: "name" },
-          { path: "lectures", select: "_id" },
-          { path: "completions", select: "student" }
+          { path: "lectures", select: "_id" }
         ]
       })
       .populate({
         path: "certificates",
-        populate: { path: "course", select: "courseTitle category" }
+        populate: {
+          path: "course",
+          select: "courseTitle category"
+        }
       });
 
     if (!user) {
       return res.status(404).json({ message: "User not found!" });
     }
 
+    //  Get all course progress for user
+    const courseProgressList = await CourseProgress.find({ userId });
+
+    //  Build progress map
+    const progressMap = {};
+    courseProgressList.forEach(cp => {
+      const completedLectures = cp.lectureProgress.filter(lp => lp.viewed).length;
+
+      progressMap[cp.courseId.toString()] = {
+        completedLectures,
+        completed: cp.completed === true
+      };
+    });
+
     let enrolledCourses = [];
     let completedCourses = [];
     let totalLecturesAll = 0;
     let completedLecturesAll = 0;
 
+    // Process each enrolled course
     user.enrolledCourses.forEach(course => {
-      const totalLectures = course.lectures.length;
+      const courseId = course._id.toString();
 
-      const completedCount = course.completions.filter(
-        c => c.student.toString() === userId
-      ).length;
+      const totalLectures = Array.isArray(course.lectures)
+        ? course.lectures.length
+        : 0;
 
-      const progress = totalLectures
-        ? Math.round((completedCount / totalLectures) * 100)
+      const progressData = progressMap[courseId] || {
+        completedLectures: 0,
+        completed: false
+      };
+
+      const completedCount = progressData.completedLectures;
+
+      const progress = totalLectures > 0
+        ? Math.min(
+            100,
+            Math.round((completedCount / totalLectures) * 100)
+          )
         : 0;
 
       totalLecturesAll += totalLectures;
       completedLecturesAll += completedCount;
-
-      
 
       const courseData = {
         _id: course._id,
@@ -344,23 +478,26 @@ export const studentDashboardData = async (req, res) => {
         totalLectures,
         completedLectures: completedCount,
         progress,
-        creator: { name: course.creator?.name || "Instructor" },
-       
+        creator: {
+          name: course.creator?.name || "Instructor"
+        }
       };
 
-      if (completedCount === totalLectures && totalLectures > 0) {
+      // FINAL & CORRECT COMPLETION CHECK
+      if (progressData.completed) {
         completedCourses.push(courseData);
       } else {
         enrolledCourses.push(courseData);
       }
     });
 
-    // Total progress = based on lectures
+    //  Overall progress (lecture-based)
     const totalProgress =
       totalLecturesAll > 0
         ? Math.round((completedLecturesAll / totalLecturesAll) * 100)
         : 0;
 
+    // Response
     return res.status(200).json({
       success: true,
       data: {
@@ -368,9 +505,9 @@ export const studentDashboardData = async (req, res) => {
         email: user.email,
         photoUrl: user.photoUrl,
 
-        // The structure your frontend expects:
-        enrolledCourses,        // NOT completed
-        
+        enrolledCourses,
+        completedCourses,
+
         certificates: user.certificates,
 
         stats: {
@@ -383,12 +520,13 @@ export const studentDashboardData = async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({
-      message: "Failed to fetch student dashboard data",
+      message: "Failed to fetch student dashboard data"
     });
   }
 };
+
 
 
 
@@ -466,7 +604,7 @@ export const analytics = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
-        
+
         completedCourses: formattedCompleted,
         certificates: formattedCertificates
       }
@@ -486,14 +624,14 @@ export const getCompletedCourses = async (req, res) => {
   try {
     const userId = req.id;
 
+    //  Get user with enrolled courses & certificates
     const user = await User.findById(userId)
       .select("enrolledCourses certificates")
       .populate({
         path: "enrolledCourses",
         populate: [
           { path: "creator", select: "name" },
-          { path: "lectures", select: "_id" },
-          { path: "completions", select: "student completedAt" }
+          { path: "lectures", select: "_id" }
         ]
       })
       .populate({
@@ -508,61 +646,241 @@ export const getCompletedCourses = async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
-    let completedCourses = [];
+    //  Get all course progress for user
+    const progressList = await CourseProgress.find({ userId });
 
-    user.enrolledCourses.forEach(course => {
-      const totalLectures = course.lectures.length;
+    //  Build progress map
+    const progressMap = {};
+    progressList.forEach(cp => {
+      const viewedCount = cp.lectureProgress.filter(lp => lp.viewed).length;
 
-      // How many lectures this user completed?
-      const completedCount = course.completions.filter(
-        c => c.student.toString() === userId
-      ).length;
-
-      // Only add fully completed courses
-      if (totalLectures > 0 && completedCount === totalLectures) {
-        const completion = course.completions.find(
-          c => c.student.toString() === userId
-        );
-
-        const certificate = user.certificates.find(
-          cert => cert.course?._id?.toString() === course._id.toString()
-        );
-
-        completedCourses.push({
-          courseId: course._id,
-          courseTitle: course.courseTitle,
-          category: course.category,
-          creator: course.creator?.name || "Instructor",
-          courseThumbnail: course.courseThumbnail || "",
-          completedAt: completion?.completedAt || null,
-          formattedCompletedAt: completion?.completedAt
-            ? new Date(completion.completedAt).toLocaleDateString("en-GB")
-            : null,
-
-          certificate: certificate
-            ? {
-                certificateId: certificate.certificateId,
-                issuedAt: certificate.issuedAt,
-                formattedIssuedAt: new Date(certificate.issuedAt).toLocaleDateString("en-GB"),
-                courseTitle: certificate.course?.courseTitle,
-                category: certificate.course?.category
-              }
-            : null
-        });
-      }
+      progressMap[cp.courseId.toString()] = {
+        viewedCount,
+        completed: cp.completed === true
+      };
     });
 
+    let completedCourses = [];
+
+    //  Loop through enrolled courses
+    user.enrolledCourses.forEach(course => {
+      const courseId = course._id.toString();
+
+      const totalLectures = Array.isArray(course.lectures)
+        ? course.lectures.length
+        : 0;
+
+      const progressData = progressMap[courseId];
+
+      // SCHEMA-CORRECT COMPLETION CHECK
+      if (!progressData || !progressData.completed) return;
+
+      const completedCount = progressData.viewedCount;
+
+      //  Find certificate for this course (if exists)
+      const certificate = user.certificates.find(
+        cert => cert.course?._id?.toString() === courseId
+      );
+
+      completedCourses.push({
+        courseId: course._id,
+        courseTitle: course.courseTitle,
+        category: course.category,
+        creator: course.creator?.name || "Instructor",
+        courseThumbnail: course.courseThumbnail || "",
+
+        totalLectures,
+        completedLectures: completedCount,
+
+        completedAt: certificate?.issuedAt || null,
+        formattedCompletedAt: certificate?.issuedAt
+          ? new Date(certificate.issuedAt).toLocaleDateString("en-GB")
+          : null,
+
+        certificate: certificate
+          ? {
+              certificateId: certificate.certificateId,
+              issuedAt: certificate.issuedAt,
+              formattedIssuedAt: new Date(certificate.issuedAt).toLocaleDateString("en-GB"),
+              courseTitle: certificate.course?.courseTitle,
+              category: certificate.course?.category,
+              courseThumbnail: certificate.course?.courseThumbnail
+            }
+          : null
+      });
+    });
+
+    // Response
     return res.status(200).json({
       success: true,
       data: completedCourses
     });
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({
-      message: "Failed to fetch completed courses",
+      message: "Failed to fetch completed courses"
     });
   }
 };
+
+
+//all instructor
+export const allInstructors = async (req, res) => {
+  try {
+    const instructors = await User.aggregate([
+      { $match: { role: "instructor" } }, // Only instructors
+      {
+        $lookup: {
+          from: "courses",          
+          localField: "_id",
+          foreignField: "creator",
+          as: "courses"
+        }
+      },
+      {
+        $addFields: {
+          totalCourses: { $size: "$courses" },
+          totalStudents: {
+            $sum: { $map: { input: "$courses", as: "c", in: { $size: "$$c.enrolledStudents" } } }
+          },
+          avgRating: {
+            $avg: {
+              $map: {
+                input: "$courses",
+                as: "c",
+                in: {
+                  $cond: [
+                    { $gt: [{ $size: "$$c.reviews" }, 0] },
+                    { $avg: "$$c.reviews.rating" },
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          photoUrl: 1,
+          totalStudents: 1,
+          totalCourses: 1,
+          avgRating: 1
+        }
+      }
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      count: instructors.length,
+      instructors
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch instructors"
+    });
+  }
+};
+
+
+
+
+// Follow or Unfollow an instructor
+export const toggleFollowInstructor = async (req, res) => {
+  try {
+    const studentId = req.id; 
+    const { instructorId } = req.params;
+
+    if (!instructorId) {
+      return res.status(400).json({ success: false, message: "Instructor ID is required" });
+    }
+
+    const student = await User.findById(studentId);
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    const isFollowing = student.followingInstructors?.includes(instructorId);
+
+    if (isFollowing) {
+      
+      student.followingInstructors = student.followingInstructors.filter(
+        id => id.toString() !== instructorId
+      );
+    } else {
+     
+      student.followingInstructors = [...(student.followingInstructors || []), instructorId];
+    }
+
+    await student.save();
+
+    return res.status(200).json({
+      success: true,
+      message: isFollowing ? "Instructor unfollowed" : "Instructor followed",
+      followingInstructors: student.followingInstructors
+    });
+
+  } catch (error) {
+    console.error("Toggle follow error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+export const updateNotificationPreferences = async (req, res) => {
+  try {
+    const userId = req.id;
+    const { notificationPreferences } = req.body;
+
+    
+
+    let preferences = {};
+
+    // CASE 1 — if no object or empty object {}
+    if (!notificationPreferences || Object.keys(notificationPreferences).length === 0) {
+      preferences = {
+        newCourse: true,
+        weeklyDigest: true,
+        followedInstructor: true,
+        noMails: false,
+      };
+    } else {
+      // CASE 2 — update based on object
+      preferences = {
+        newCourse: notificationPreferences.newCourse || false,
+        weeklyDigest: notificationPreferences.weeklyDigest || false,
+        followedInstructor: notificationPreferences.followedInstructor || false,
+        noMails: notificationPreferences.noMails || false,
+      };
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { notificationPreferences: preferences },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Preferences updated successfully",
+      preferences: updatedUser.notificationPreferences,
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
 
 

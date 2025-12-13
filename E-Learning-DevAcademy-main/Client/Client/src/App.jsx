@@ -45,6 +45,8 @@ import AboutUs from './Pages/student/Home/Company/AboutUs'
 import ContactUs from './Pages/student/Home/Company/ContactUs'
 import TermsOfService from './Pages/student/Home/Company/TermsOfService'
 import PrivacyPolicy from './Pages/student/Home/Company/PrivacyPolicy'
+import Instructors from './Pages/student/Dashboard/Instructors'
+import Messages from './Pages/MainAdmin/Messages'
 
 
 
@@ -132,6 +134,10 @@ const appRouter=createBrowserRouter([
         {
           path:"completed-courses",
           element:<CompletedCourses/>
+        },
+        {
+          path:"instructors",
+          element:<Instructors/>
         }
       ]
      },
@@ -225,6 +231,10 @@ const appRouter=createBrowserRouter([
         {
           path:"manageCourses",
           element:<ManageCourses/>
+        },
+        {
+          path:"messages",
+          element:<Messages/>
         }
         
       ]

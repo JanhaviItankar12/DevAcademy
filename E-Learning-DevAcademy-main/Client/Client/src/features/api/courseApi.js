@@ -314,7 +314,24 @@ export const courseApi = createApi({
         url:"/admin/manageCourses",
         method:'GET'
       })
-    })
+    }),
+
+    topCourses:builder.query({
+      query:()=>({
+        url:"/admin/top-courses",
+        method:'GET'
+      })
+    }),
+
+    topInstructors:builder.query({
+      query:()=>({
+        url:"/admin/top-instructors",
+        method:'GET'
+      })
+    }),
+
+
+
   }),
   keepUnusedDataFor: 0,                 // disable caching
   refetchOnMountOrArgChange: true,    
@@ -357,7 +374,9 @@ export const {
   useManageUserQuery,
   useApproveUserMutation,
   useRejectUserMutation,
-  useManageCoursesQuery
+  useManageCoursesQuery,
+  useTopCoursesQuery,
+  useTopInstructorsQuery
   
 } = courseApi
 

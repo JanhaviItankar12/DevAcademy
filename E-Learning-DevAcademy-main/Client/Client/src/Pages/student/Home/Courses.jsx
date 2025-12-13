@@ -19,6 +19,8 @@ export default function Courses() {
 
     const allCourses = data?.courses || [];
 
+    
+    
 
     // Handle enrollment
     const handleEnrollment = (courseId) => {
@@ -47,7 +49,7 @@ export default function Courses() {
 
     // Filter and sort courses
     const filteredCourses = allCourses
-        .filter(course => course.isPublished)
+        .filter(course => course)
         .filter(course => {
             const matchesSearch =
   (course?.courseTitle?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
@@ -274,9 +276,9 @@ export default function Courses() {
                                         onChange={(e) => setSortBy(e.target.value)}
                                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
                                     >
-                                        <option value="popular">Most Popular</option>
+                                        
                                         <option value="rating">Highest Rated</option>
-                                        <option value="newest">Newest</option>
+                                       
                                         <option value="price-low">Price: Low to High</option>
                                         <option value="price-high">Price: High to Low</option>
                                     </select>
@@ -296,7 +298,7 @@ export default function Courses() {
                                             setSelectedPrice('all');
                                             setSearchQuery('');
                                         }}
-                                        className="px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all"
+                                        className="px-6 py-3 cursor-pointer bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all"
                                     >
                                         Clear Filters
                                     </button>
@@ -338,7 +340,7 @@ export default function Courses() {
                                                             <span className="ml-1 text-gray-500 text-xs">({course.reviewCount})</span>
                                                         </div>
                                                         <span className="text-gray-400">•</span>
-                                                        <span className="text-gray-600 text-sm">{course.enrolledStudents.toLocaleString()} students</span>
+                                                        <span className="text-gray-600 text-sm">{course.enrolledStudents} students</span>
                                                     </div>
 
                                                     <div className="flex items-center justify-between mb-4">
@@ -351,13 +353,13 @@ export default function Courses() {
 
                                                     <div className="flex items-center justify-between pt-4 border-t">
                                                         <div className="text-2xl font-bold text-purple-600">
-                                                            ₹{course.coursePrice.toLocaleString()}
+                                                            ₹{course.coursePrice}
                                                         </div>
                                                         <button
                                                             onClick={() => handleEnrollment(course.id)}
                                                             className="px-6 cursor-pointer py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all font-semibold text-sm"
                                                         >
-                                                            Enroll Now
+                                                           {course.isPurchased ? "Continue Course" :"Enroll Now"}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -373,7 +375,7 @@ export default function Courses() {
                                                 disabled={currentPage === 1}
                                                 className={`p-2 rounded-lg ${currentPage === 1
                                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white text-purple-600 hover:bg-purple-50 border border-purple-600'
+                                                        : 'bg-white text-purple-600 cursor-pointer hover:bg-purple-50 border border-purple-600'
                                                     }`}
                                             >
                                                 <ChevronLeft className="w-5 h-5" />
@@ -394,8 +396,8 @@ export default function Courses() {
                                                                 key={pageNumber}
                                                                 onClick={() => handlePageChange(pageNumber)}
                                                                 className={`px-4 py-2 rounded-lg font-semibold ${currentPage === pageNumber
-                                                                        ? 'bg-purple-600 text-white'
-                                                                        : 'bg-white text-gray-700 hover:bg-purple-50 border border-gray-300'
+                                                                        ? 'bg-purple-600 text-white cursor-pointer'
+                                                                        : 'bg-white text-gray-700 hover:bg-purple-50 cursor-pointer border border-gray-300'
                                                                     }`}
                                                             >
                                                                 {pageNumber}
@@ -416,7 +418,7 @@ export default function Courses() {
                                                 disabled={currentPage === totalPages}
                                                 className={`p-2 rounded-lg ${currentPage === totalPages
                                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white text-purple-600 hover:bg-purple-50 border border-purple-600'
+                                                        : 'bg-white text-purple-600 cursor-pointer hover:bg-purple-50 border border-purple-600'
                                                     }`}
                                             >
                                                 <ChevronRight className="w-5 h-5" />

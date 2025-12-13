@@ -1,4 +1,4 @@
-import { BookCheckIcon, ChartAreaIcon, ChartNoAxesColumn, SquareLibrary, Menu, X, Award, Users, TrendingUp } from 'lucide-react'
+import { BookCheckIcon, ChartAreaIcon, ChartNoAxesColumn, SquareLibrary, Menu, X, Award, Users, TrendingUp, User, MessageCircle } from 'lucide-react'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import { Link, Outlet, useLocation } from 'react-router-dom'
@@ -17,7 +17,8 @@ const Sidebar = () => {
         admin: [
             { path: 'dashboard', icon: ChartNoAxesColumn, label: 'Dashboard' },
             { path: 'topcourses', icon: Award, label: 'Top Courses' },
-            { path: 'topinstructor', icon: Users, label: 'Top Instructors' }
+            { path: 'topinstructor', icon: Users, label: 'Top Instructors' },
+            { path: 'messages', icon: MessageCircle, label: 'Message' },
         ],
         instructor: [
             { path: 'dashboard', icon: ChartNoAxesColumn, label: 'Dashboard' },
@@ -27,7 +28,8 @@ const Sidebar = () => {
         student: [
             { path: 'dashboard', icon: ChartNoAxesColumn, label: 'Dashboard' },
             { path: 'analytics', icon: ChartAreaIcon, label: 'Analytics' },
-            { path: 'completed-courses', icon: BookCheckIcon, label: 'Completed Courses' }
+            { path: 'completed-courses', icon: BookCheckIcon, label: 'Completed Courses' },
+            { path: 'instructors', icon: User, label: 'Instructors' }
         ]
     };
 

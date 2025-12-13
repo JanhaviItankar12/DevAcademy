@@ -137,6 +137,22 @@ export const authApi = createApi({
             }),
         }),
 
+        //all instructors
+        allInstructors:builder.query({
+          query:()=>({
+            url:"/student/instructors",
+            method:'GET'
+          })
+        }),
+
+        //follow instructors
+        followInstructors:builder.mutation({
+           query:(instructorId)=>({
+            url:`/student/follow/${instructorId}`,
+            method:'POST'
+           })
+        }),
+
 
         //user can send message to admin for inquiry
         createMessage: builder.mutation({
@@ -146,6 +162,39 @@ export const authApi = createApi({
                 body: messageData
             })
         }),
+
+        //get messages 
+        getMessages:builder.query({
+            query:()=>({
+                url:"/admin/get-messages",
+                method:'GET'
+            })
+        }),
+
+        //delete-message
+        deleteMessage:builder.mutation({
+            query:(messageId)=>({
+                url:`/admin/delete-message/${messageId}`,
+                method:'DELETE'
+            })
+        }),
+
+        markAsRead:builder.mutation({
+            query:({messageId,replyMessage})=>({
+                url:`/admin/mark-as-read/${messageId}`,
+                method:'POST',
+                body:{replyMessage}
+            })
+        }),
+
+        //update-notify-preferences
+        updatePreference:builder.mutation({
+            query:(notificationPreferences)=>({
+                url:"/setting/update-notify-prefernce",
+                method:"POST",
+                body:{notificationPreferences}
+            })
+        })
 
 
 
@@ -168,7 +217,13 @@ export const {
     useGenerateCertificateMutation,
     useGetCompletedCoursesQuery,
     useDownloadCertificateQuery,
-    useCreateMessageMutation
+    useCreateMessageMutation,
+    useAllInstructorsQuery,
+    useFollowInstructorsMutation,
+    useGetMessagesQuery,
+    useDeleteMessageMutation,
+    useMarkAsReadMutation,
+    useUpdatePreferenceMutation
 
 } = authApi;
 

@@ -1,51 +1,153 @@
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useGetAdminDashboardQuery } from '@/features/api/courseApi';
+import { useTopInstructorsQuery } from '@/features/api/courseApi';
+import { Star, Users, BookOpen, Mail, TrendingUp } from 'lucide-react';
 import React from 'react'
 
 const TopInstructor = () => {
-  const { data, isLoading, isError, refetch } = useGetAdminDashboardQuery();
-   
+  const { data, isLoading, isError, refetch } = useTopInstructorsQuery();
+  console.log(data);
   
-     if (isLoading) {
+  if (isLoading) {
     return <LoadingSpinner/>
-    }
-    if (isError) return <p>Failed to load instructor courses</p>;
+  }
+  
+  if (isError) return <p className="text-red-500 text-lg p-6">Failed to load instructor data</p>;
+
+  // Format revenue to currency
+ // Format revenue to Indian Rupees
+const formatRevenue = (amount) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-10">
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900">Top Instructors</h2>
-                <p className="text-lg text-gray-500 mt-1">Highest earning instructors</p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-lg font-semibold text-gray-600 uppercase">Instructor</th>
-                      <th className="px-6 py-3 text-left text-lg font-semibold text-gray-600 uppercase">Students</th>
-                      <th className="px-6 py-3 text-left text-lg font-semibold text-gray-600 uppercase">Revenue</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {data?.data?.topInstructors.map((instructor, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4">
-                          <div>
-                            <p className="font-medium text-gray-900 text-lg">{instructor.name}</p>
-                            <p className="text-lg text-gray-500">{instructor.totalCourses} courses</p>
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mt-7">
+      <div className="p-6 bg-gradient-to-r from-purple-50 to-white border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Top Instructors</h2>
+            <p className="text-gray-600 text-lg mt-1">Leading educators by performance</p>
+          </div>
+          <div className="p-3 bg-purple-100 rounded-xl">
+            <TrendingUp className="w-6 h-6 text-purple-600" />
+          </div>
+        </div>
+      </div>
+      
+      <div className="overflow-hidden">
+        <div className="min-w-full divide-y divide-gray-100">
+          {data?.topInstructors.map((instructor, index) => (
+            <div key={index} className="hover:bg-purple-50/50 transition-colors duration-200">
+              <div className="px-6 py-5">
+                <div className="flex items-start gap-4">
+                  {/* Instructor Avatar */}
+                  <div className="flex-shrink-0">
+                    <div className="relative">
+                      {instructor.photoUrl ? (
+                        <img
+                          src={instructor.photoUrl}
+                          alt={instructor.name}
+                          className="w-16 h-16 rounded-xl object-cover border-2 border-purple-100"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center border-2 border-purple-100">
+                          <span className="text-2xl font-bold text-purple-600">
+                            {instructor.name.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                      {index < 3 && (
+                        <div className={`absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                          index === 0 
+                            ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' 
+                            : index === 1
+                            ? 'bg-gray-100 text-gray-700 border border-gray-200'
+                            : 'bg-orange-100 text-orange-700 border border-orange-200'
+                        }`}>
+                          #{index + 1}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Instructor Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                          {instructor.name}
+                          {index < 3 && (
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                          )}
+                        </h3>
+                        
+                        <div className="flex items-center gap-3 mt-2">
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <BookOpen className="w-4 h-4" />
+                            <span>{instructor.totalCourses} course{instructor.totalCourses !== 1 ? 's' : ''}</span>
                           </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="font-semibold text-gray-900 text-lg">{instructor.totalEnrolledStudents}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="font-semibold text-green-600 text-lg">{instructor.revenue}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <Users className="w-4 h-4" />
+                            <span>{instructor.totalEnrolledStudents} student{instructor.totalEnrolledStudents !== 1 ? 's' : ''}</span>
+                          </div>
+                        </div>
+                        
+                        {instructor.email && (
+                          <div className="flex items-center gap-1 mt-2 text-sm text-gray-500">
+                            <Mail className="w-4 h-4" />
+                            <span className="truncate">{instructor.email}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Revenue */}
+                      <div className="text-right">
+                        <div className="text-xl font-bold text-green-600">
+                          {formatRevenue(instructor.revenue)}
+                        </div>
+                        <div className="text-sm text-gray-500 mt-1">Total Revenue</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer with stats summary */}
+      {data?.topInstructors.length > 0 && (
+        <div className="px-6 py-4 bg-gradient-to-r from-purple-50/50 to-white border-t border-gray-100">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {data.topInstructors.length}
+              </div>
+              <div className="text-sm text-gray-600">Total Instructors</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {data.topInstructors.reduce((sum, inst) => sum + inst.totalEnrolledStudents, 0).toLocaleString()}
+              </div>
+              <div className="text-sm text-gray-600">Total Students</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {formatRevenue(data.topInstructors.reduce((sum, inst) => sum + inst.revenue, 0))}
+              </div>
+              <div className="text-sm text-gray-600">Combined Revenue</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

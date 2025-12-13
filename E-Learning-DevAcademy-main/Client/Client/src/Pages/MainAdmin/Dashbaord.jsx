@@ -11,7 +11,7 @@ const AdminDashboard = () => {
   const [range, setRange] = useState('week');
   const { data, isLoading, isError, refetch } = useGetAdminDashboardQuery(range);
   const { data: adminData, isError: adminError, isLoading: adminLoading } = useGetAdminDataQuery();
-   console.log(data);
+
 
   useEffect(() => {
     if (refetch) {
@@ -79,9 +79,18 @@ const AdminDashboard = () => {
                 <p className="text-lg font-semibold text-gray-900">Administrator</p>
                 <p className="text-lg text-gray-500">{adminData?.admin?.name}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                {adminData?.admin?.name.charAt(0).toUpperCase()}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg overflow-hidden">
+                {adminData?.admin?.photoUrl ? (
+                  <img
+                    src={adminData.admin.photoUrl}
+                    alt="Admin"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{adminData?.admin?.name?.charAt(0).toUpperCase()}</span>
+                )}
               </div>
+
 
             </div>
           </div>
@@ -98,7 +107,7 @@ const AdminDashboard = () => {
               title="Total Students"
               value={data?.data?.totalStudents}
               subtitle={`${data?.data?.studentThisMonth} enrolled this month`}
-              
+
               changeLabel="vs last month"
               color="text-blue-600"
               bgColor="bg-blue-50"
@@ -108,7 +117,7 @@ const AdminDashboard = () => {
               title="Total Instructors"
               value={data?.data?.totalInstructors}
               subtitle={`${data?.data?.instructorsThisMonth} joined this month`}
-             
+
               changeLabel="vs last month"
               color="text-purple-600"
               bgColor="bg-purple-50"
@@ -118,7 +127,7 @@ const AdminDashboard = () => {
               title="Total Sales"
               value={`₹ ${data?.data?.totalRevenue}`}
               subtitle="Revenue this month"
-              
+
               changeLabel="vs last month"
               color="text-green-600"
               bgColor="bg-green-50"
@@ -128,7 +137,7 @@ const AdminDashboard = () => {
               title="Completion Rate"
               value={data?.data?.completionRate}
               subtitle="Average across all courses"
-             
+
               changeLabel="vs last month"
               color="text-orange-600"
               bgColor="bg-orange-50"
@@ -144,7 +153,7 @@ const AdminDashboard = () => {
               </div>
               <p className="text-2xl font-bold text-gray-900">{data?.data?.activeCourses}</p>
               <p className='text-gray-500 text-sm'>These are the courses currently available and running for students.</p>
-</div>
+            </div>
 
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <div className="flex items-center gap-3 mb-2">
@@ -152,30 +161,30 @@ const AdminDashboard = () => {
                 <h3 className="text-gray-600 text-sm font-medium">InActive Courses</h3>
               </div>
               <p className="text-2xl font-bold text-gray-900">{data?.data?.inactiveCourses}</p>
-             <p className='text-gray-500 text-sm'>These courses are currently not active or unavailable for enrollment.</p>
+              <p className='text-gray-500 text-sm'>These courses are currently not active or unavailable for enrollment.</p>
 
             </div>
 
-         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-  <div className="flex items-center gap-3 mb-4">
-    <TrendingUp className="w-5 h-5 text-emerald-600" />
-    <h3 className="text-gray-600 text-sm font-medium">Platform Growth</h3>
-  </div>
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="flex items-center gap-3 mb-4">
+                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                <h3 className="text-gray-600 text-sm font-medium">Platform Growth</h3>
+              </div>
 
-  {/* Flex container for horizontal layout with labels */}
-  <div className="flex gap-10">
-    <div className="flex flex-col items-center">
-      
-      <span className="text-2xl font-bold text-gray-900">{data?.data?.studentGrowth}</span>
-      <span className="text-gray-500 text-sm">Student Growth</span>
-    </div>
-    <div className="flex flex-col items-center">
-      
-      <span className="text-2xl font-bold text-gray-900">{data?.data?.revenueGrowth}</span>
-      <span className="text-gray-500 text-sm">Revenue Growth</span>
-    </div>
-  </div>
-</div>
+              {/* Flex container for horizontal layout with labels */}
+              <div className="flex gap-10">
+                <div className="flex flex-col items-center">
+
+                  <span className="text-2xl font-bold text-gray-900">{data?.data?.studentGrowth}%</span>
+                  <span className="text-gray-500 text-sm">Student Growth</span>
+                </div>
+                <div className="flex flex-col items-center">
+
+                  <span className="text-2xl font-bold text-gray-900">{data?.data?.revenueGrowth}%</span>
+                  <span className="text-gray-500 text-sm">Revenue Growth</span>
+                </div>
+              </div>
+            </div>
 
 
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">

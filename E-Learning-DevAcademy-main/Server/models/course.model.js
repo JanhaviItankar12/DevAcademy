@@ -76,7 +76,8 @@ const courseSchema=new mongoose.Schema({
     isPublished:{
         type:Boolean,
         default:false
-    }
+    },
+    publishedAt: { type: Date },
 
 },{timestamps:true}) ;
 

@@ -24,6 +24,8 @@ export default function HomePage() {
   const courses = data?.courses || [];
   const reviews = dataOfReviews?.reviews || [];
 
+  console.log(courses);
+
   const navigate = useNavigate();
 
 
@@ -271,7 +273,7 @@ export default function HomePage() {
                       ₹{course.coursePrice.toLocaleString()}
                     </div>
                     <button onClick={() => handleEnrollment(course.id)} className="px-6 cursor-pointer py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all font-semibold text-sm">
-                      Enroll Now
+                       {course.isPurchased ? "Continue Course" :"Enroll Now"}
                     </button>
                   </div>
                 </div>

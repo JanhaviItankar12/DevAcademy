@@ -171,7 +171,7 @@ export default function MangageUser() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid cursor-pointer grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -184,7 +184,7 @@ export default function MangageUser() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white cursor-pointer rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-lg text-gray-600 mb-1">Pending</p>
@@ -196,7 +196,7 @@ export default function MangageUser() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white cursor-pointer rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-lg text-gray-600 mb-1">Approved</p>
@@ -208,7 +208,7 @@ export default function MangageUser() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white cursor-pointer rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-lg text-gray-600 mb-1">Rejected</p>
@@ -227,7 +227,7 @@ export default function MangageUser() {
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab('students')}
-                className={`px-6 py-4 text-lg font-medium border-b-2 transition-colors ${
+                className={`px-6 py-4 text-lg cursor-pointer font-medium border-b-2 transition-colors ${
                   activeTab === 'students'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -237,7 +237,7 @@ export default function MangageUser() {
               </button>
               <button
                 onClick={() => setActiveTab('pending')}
-                className={`px-6 py-4 text-lg font-medium border-b-2 transition-colors ${
+                className={`px-6 py-4 text-lg font-medium cursor-pointer border-b-2 transition-colors ${
                   activeTab === 'pending'
                     ? 'border-orange-500 text-orange-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -247,7 +247,7 @@ export default function MangageUser() {
               </button>
               <button
                 onClick={() => setActiveTab('approved')}
-                className={`px-6 py-4 text-lg font-medium border-b-2 transition-colors ${
+                className={`px-6 py-4 text-lg font-medium cursor-pointer border-b-2 transition-colors ${
                   activeTab === 'approved'
                     ? 'border-green-500 text-green-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -257,7 +257,7 @@ export default function MangageUser() {
               </button>
               <button
                 onClick={() => setActiveTab('rejected')}
-                className={`px-6 py-4 text-lg font-medium border-b-2 transition-colors ${
+                className={`px-6 py-4 text-lg font-medium cursor-pointer border-b-2 transition-colors ${
                   activeTab === 'rejected'
                     ? 'border-red-500 text-red-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -375,14 +375,14 @@ export default function MangageUser() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleApprove(user._id)}
-                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
+                                className="bg-green-500 cursor-pointer hover:bg-green-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
                               >
                                 <Check className="w-4 h-4" />
                                 Approve
                               </button>
                               <button
                                 onClick={() => handleReject(user._id)}
-                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
+                                className="bg-red-500 cursor-pointer hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
                               >
                                 <X className="w-4 h-4" />
                                 Reject

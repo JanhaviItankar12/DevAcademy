@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import { useCreateMessageMutation } from '@/features/api/authApi';
 
 
+
+
 export default function ContactUs() {
   const [formData, setFormData] = useState({
     name: '',
@@ -24,10 +26,35 @@ export default function ContactUs() {
     });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault(); // prevent page reload
 
- try {
+  // ----- FRONTEND VALIDATION -----
+  const { name, email, subject, message } = formData;
+
+  if (!name.trim() || name.trim().length < 2) {
+    toast.error("Name must be at least 2 characters long");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.trim() || !emailRegex.test(email)) {
+    toast.error("Please enter a valid email address");
+    return;
+  }
+
+  if (!subject.trim() || subject.trim().length < 5) {
+    toast.error("Subject must be at least 5 characters long");
+    return;
+  }
+
+  if (!message.trim() || message.trim().length < 10) {
+    toast.error("Message must be at least 10 characters long");
+    return;
+  }
+
+  try {
+    // Call API only if validation passes
     await createMessage(formData).unwrap();
 
     // Show success toast
@@ -41,11 +68,13 @@ export default function ContactUs() {
       message: '',
       category: 'general',
     });
+
   } catch (error) {
     console.error("Failed to send message:", error);
     toast.error("Failed to send message. Please try again.");
   }
 };
+
 
 
   const helpTopics = [
@@ -62,7 +91,7 @@ export default function ContactUs() {
   {
     icon: <Mail className="w-6 h-6 text-purple-600" />,
     title: "Contact Support",
-    description: "Reach us via email for any queries at devacademy2025@gmail.com."
+    description: "Reach us via email for any queries at devacademy122025@gmail.com."
   },
   {
     icon: <Phone className="w-6 h-6 text-purple-600" />,
@@ -75,7 +104,7 @@ export default function ContactUs() {
     {
       icon: <Mail className="w-8 h-8" />,
       title: "Email Us",
-      info: "devacademy2025@gmail.com",
+      info: "devacademy122025@gmail.com",
       description: "We'll respond within 24-48 hours",
       color: "purple"
     },

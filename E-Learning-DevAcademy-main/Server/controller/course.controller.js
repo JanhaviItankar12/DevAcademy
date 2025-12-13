@@ -6,6 +6,7 @@ import { removeLecture } from "./lecture.controller.js";
 import { Lecture } from "../models/lecture.model.js";
 import { CourseProgress } from '../models/courseProgress.model.js';
 import { User } from '../models/user.model.js';
+import { sendInstructorPublishEmail, sendWeeklyDigestEmail } from '../utils/sendEmail.js';
 
 
 export const createCourse = async (req, res) => {
@@ -18,7 +19,7 @@ export const createCourse = async (req, res) => {
             })
         }
 
-        if(courseTitle.trim().length <3){
+        if (courseTitle.trim().length < 3) {
             return res.status(400).json({
                 message: "Course title must be at least 3 characters long"
             })
@@ -161,25 +162,23 @@ export const getCourseById = async (req, res) => {
 export const togglePublishCourse = async (req, res) => {
     try {
         const { courseId } = req.params;
-        const { publish } = req.query; // "true" or "false"
+        const { publish } = req.query;
 
-        const course = await Course.findById(courseId).populate("lectures");
+        const course = await Course.findById(courseId)
+            .populate("lectures")
+            .populate("creator"); // IMPORTANT
 
         if (!course) {
-            return res.status(404).json({
-                message: "Course not found!"
-            });
+            return res.status(404).json({ message: "Course not found!" });
         }
 
+        // VALIDATIONS...
         if (publish === "true") {
-
             const isEmpty = (value) =>
-                value === undefined ||
-                value === null ||
-                value.toString().trim() === "";
+                value === undefined || value === null || value.toString().trim() === "";
 
-            //  Check required course fields
             const missingFields = [];
+
             if (isEmpty(course.courseTitle)) missingFields.push("courseTitle");
             if (isEmpty(course.subTitle)) missingFields.push("subTitle");
             if (isEmpty(course.description)) missingFields.push("description");
@@ -188,36 +187,70 @@ export const togglePublishCourse = async (req, res) => {
             if (isEmpty(course.category)) missingFields.push("category");
             if (isEmpty(course.courseThumbnail)) missingFields.push("courseThumbnail");
 
-            //  Check lectures videoUrl
             const lecturesMissingVideo = course.lectures
-                .filter(lecture => isEmpty(lecture.videoUrl))
-                .map(lecture => lecture.lectureTitle || lecture._id);
+                .filter((lecture) => isEmpty(lecture.videoUrl))
+                .map((lecture) => lecture.lectureTitle || lecture._id);
 
             if (missingFields.length > 0 || lecturesMissingVideo.length > 0) {
                 return res.status(400).json({
                     message: "Cannot publish course. Required fields or lecture videos missing.",
                     missingCourseFields: missingFields,
-                    lecturesMissingVideo
+                    lecturesMissingVideo,
                 });
             }
         }
 
-        // Update publish status
-        course.isPublished = publish === "true";
+        if (publish === "true") {
+            course.isPublished = true;
+            course.publishedAt = new Date(); //  Set publish date
+        } else {
+            course.isPublished = false;
+            course.publishedAt = null; // Optional: reset if unpublished
+        }
+
         await course.save();
+
+        //  SEND EMAIL NOTIFICATIONS
+        
+        if (publish === "true") {
+            const instructorId = course.creator._id;
+
+            //  Users who LIKE getting "New Course" emails
+            const newCourseUsers = await User.find({
+                "notificationPreferences.newCourse": true,
+            });
+
+            //  Users who FOLLOW this instructor + prefer instructorPublish mails
+            const instructorFollowers = await User.find({
+                followingInstructors: instructorId,
+                "notificationPreferences.followedInstructor": true,
+            });
+
+            const usersToEmail = [...newCourseUsers, ...instructorFollowers];
+
+            // Remove duplicate emails
+            const uniqueUsers = Array.from(new Set(usersToEmail.map((u) => u.email)));
+
+            if (uniqueUsers.length > 0) {
+                await sendInstructorPublishEmail(uniqueUsers, course.creator.name, course.courseTitle, course._id);
+
+            }
+        }
 
         return res.status(200).json({
             message: `Course is ${course.isPublished ? "Published" : "Unpublished"}`,
-            course
+            course,
         });
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            message: "Failed to update status of course"
+            message: "Failed to update status of course",
         });
     }
 };
+
+
+
 
 
 
@@ -264,25 +297,113 @@ export const removeCourse = async (req, res) => {
     }
 }
 
-export const getPublishedCourses = async (_, res) => {
+export const getPublishedCourses = async (req, res) => {
     try {
-        const courses = await Course.find({ isPublished: true }).populate({ path: "creator", select: "name photoUrl" })
+        const courses = await Course.find({ isPublished: true })
+            .populate({ path: "creator", select: "name" })
             .select("-__v");
 
-        if (!courses) {
-            return res.status(404).json({
-                message: "Courses not Found"
-            })
+        let enrolledCourseIds = [];
+
+        
+
+        if (req.id) {
+            const user = await User.findById(req.id).select("enrolledCourses");
+            enrolledCourseIds = user?.enrolledCourses.map(id => id.toString()) || [];
         }
 
-        const formattedCourses = courses.map((course => {
-            const reviewCount = course.reviews.length;
+        
 
-            //average rating
+        const formattedCourses = courses.map(course => {
+            const reviewCount = course.reviews.length;
+            const rating =
+                reviewCount > 0
+                    ? course.reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
+                    : 0;
+
+            return {
+                id: course._id,
+                courseTitle: course.courseTitle,
+                coursePrice: course.coursePrice,
+                courseLevel: course.courseLevel,
+                courseThumbnail: course.courseThumbnail,
+                lectures: course.lectures.length,
+                rating: Number(rating.toFixed(1)),
+                reviewCount,
+                isPurchased: enrolledCourseIds.includes(course._id.toString()),
+                creator: {
+                    name: course.creator?.name,
+                    photoUrl: course.creator?.photoUrl
+                },
+                enrolledStudents:course.enrolledStudents.length,
+                category:course.category
+            };
+        });
+
+        
+
+        res.status(200).json({ courses: formattedCourses });
+
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get courses" });
+    }
+};
+
+
+export const getPublishedCourseForHome = async (req, res) => {
+    try {
+        const courses = await Course.find({ isPublished: true })
+            .populate({ path: "creator", select: "name photoUrl" })
+            .select("-__v");
+
+        if (!courses || courses.length === 0) {
+            return res.status(404).json({ message: "Courses not found" });
+        }
+
+        // Function to get top 2 courses per level sorted by rating
+        const getTopRated = (level) => {
+            return courses
+                .filter(c => c.courseLevel === level)
+                .map(c => {
+                    const reviewCount = c.reviews.length;
+                    const rating =
+                        reviewCount > 0
+                            ? c.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+                            : 0;
+                    return { course: c, rating };
+                })
+                .sort((a, b) => b.rating - a.rating) // highest rating first
+                .slice(0, 2)
+                .map(item => item.course);
+        };
+
+        const beginner = getTopRated("Beginner");
+        const medium = getTopRated("Medium");
+        const advance = getTopRated("Advance");
+
+        const selectedCourses = [...beginner, ...medium, ...advance];
+
+
+        let enrolledCourseIds = [];
+
+        // If user is logged in
+        if (req.id) {
+            const user = await User.findById(req.id).select("enrolledCourses");
+            if (user) {
+                enrolledCourseIds = user.enrolledCourses.map(id => id.toString());
+            }
+        }
+
+        // Format course for frontend
+        const formatCourse = (course) => {
+            const reviewCount = course.reviews.length;
             const rating =
                 reviewCount > 0
                     ? course.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
                     : 0;
+
+            // Check if this user has enrolled in this course
+            const isPurchased = enrolledCourseIds.includes(course._id.toString());
 
             return {
                 id: course._id,
@@ -292,228 +413,150 @@ export const getPublishedCourses = async (_, res) => {
                 courseLevel: course.courseLevel,
                 coursePrice: course.coursePrice,
                 courseThumbnail: course.courseThumbnail,
-
-                // computed fields
+                
                 enrolledStudents: course.enrolledStudents.length,
+                lectures: course.lectures.length,
+
                 rating: Number(rating.toFixed(1)),
                 reviewCount,
-
-                lectures: course.lectures.length,
+                isPurchased, // Key field
                 isPublished: course.isPublished,
-
                 creator: {
                     name: course.creator?.name,
                     photoUrl: course.creator?.photoUrl,
-                },
-            }
-        }));
+                }
+            };
+        };
 
         return res.status(200).json({
-            courses: formattedCourses,
+            courses: selectedCourses.map(formatCourse)
+        });
 
-        })
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            message: "Failed to get published courses"
-
-        })
+            message: "Failed to fetch courses for home"
+        });
     }
-}
-
-export const getPublishedCourseForHome = async (req, res) => {
-  try {
-    const courses = await Course.find({ isPublished: true })
-      .populate({ path: "creator", select: "name photoUrl" })
-      .select("-__v");
-
-    if (!courses) {
-      return res.status(404).json({ message: "Courses not found" });
-    }
-
-    // Function to get top 2 courses per level sorted by rating
-    const getTopRated = (level) => {
-      return courses
-        .filter(c => c.courseLevel === level)
-        .map(c => {
-          const reviewCount = c.reviews.length;
-          const rating =
-            reviewCount > 0
-              ? c.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-              : 0;
-          return { course: c, rating };
-        })
-        .sort((a, b) => b.rating - a.rating) // highest rating first
-        .slice(0, 2)
-        .map(item => item.course);
-    };
-
-    const beginner = getTopRated("Beginner");
-    const medium = getTopRated("Medium");
-    const advance = getTopRated("Advance");
-
-    // Combine all 6 courses
-    const selectedCourses = [...beginner, ...medium, ...advance];
-
-    // Format course for frontend
-    const formatCourse = (course) => {
-      const reviewCount = course.reviews.length;
-      const rating =
-        reviewCount > 0
-          ? course.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-          : 0;
-
-      return {
-        id: course._id,
-        courseTitle: course.courseTitle,
-        subTitle: course.subTitle,
-        category: course.category,
-        courseLevel: course.courseLevel,
-        coursePrice: course.coursePrice,
-        courseThumbnail: course.courseThumbnail,
-
-        enrolledStudents: course.enrolledStudents.length,
-        lectures: course.lectures.length,
-
-        rating: Number(rating.toFixed(1)),
-        reviewCount,
-
-        isPublished: course.isPublished,
-        creator: {
-          name: course.creator?.name,
-          photoUrl: course.creator?.photoUrl,
-        }
-      };
-    };
-
-    return res.status(200).json({
-      courses: selectedCourses.map(formatCourse)
-    });
-
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Failed to fetch courses for home"
-    });
-  }
 };
+
 
 
 //send data for hero section
 export const getDataforHeroSection = async (req, res) => {
-  try {
-    // Total students
-    let totalStudents = await User.countDocuments({ role: "student" });
+    try {
+        // Total students
+        let totalStudents = await User.countDocuments({ role: "student" });
 
-    // Total instructors
-    let totalInstructors = await User.countDocuments({ role: "instructor" });
+        // Total instructors
+        let totalInstructors = await User.countDocuments({ role: "instructor" });
 
-    // Total published courses
-    let totalPublishedCourses = await Course.countDocuments({ isPublished: true });
+        // Total published courses
+        let totalPublishedCourses = await Course.countDocuments({ isPublished: true });
 
-    // Calculate completion rate across all courses
-    const courses = await Course.find({ isPublished: true }).select(
-      "enrolledStudents completions"
-    );
+        // Calculate completion rate across all courses
+        const courses = await Course.find({ isPublished: true }).select(
+            "enrolledStudents completions"
+        );
 
-    let totalEnrolled = 0;
-    let totalCompleted = 0;
+        let totalEnrolled = 0;
+        let totalCompleted = 0;
 
-    courses.forEach(course => {
-      const enrolledCount = course.enrolledStudents?.length || 0;
-      const completedCount = course.completions?.length || 0;
+        courses.forEach(course => {
+            const enrolledCount = course.enrolledStudents?.length || 0;
+            const completedCount = course.completions?.length || 0;
 
-      totalEnrolled += enrolledCount;
-      totalCompleted += completedCount;
-    });
+            totalEnrolled += enrolledCount;
+            totalCompleted += completedCount;
+        });
 
-    const completionRate =
-      totalEnrolled > 0
-        ? Number(((totalCompleted / totalEnrolled) * 100).toFixed(1))
-        : 0;
+        const completionRate =
+            totalEnrolled > 0
+                ? Number(((totalCompleted / totalEnrolled) * 100).toFixed(1))
+                : 0;
 
-    // Calculate average rating
-    const ratingAgg = await Course.aggregate([
-      { $match: { isPublished: true } },
-      { $unwind: "$reviews" },
-      {
-        $group: {
-          _id: null,
-          avgRating: { $avg: "$reviews.rating" },
-          totalReviews: { $sum: 1 }
+        // Calculate average rating
+        const ratingAgg = await Course.aggregate([
+            { $match: { isPublished: true } },
+            { $unwind: "$reviews" },
+            {
+                $group: {
+                    _id: null,
+                    avgRating: { $avg: "$reviews.rating" },
+                    totalReviews: { $sum: 1 }
+                }
+            }
+        ]);
+
+        let overallRating = 0;
+        if (ratingAgg.length > 0) {
+            overallRating = Number(ratingAgg[0].avgRating.toFixed(1));
         }
-      }
-    ]);
 
-    let overallRating = 0;
-    if (ratingAgg.length > 0) {
-      overallRating = Number(ratingAgg[0].avgRating.toFixed(1));
+        // Subtract 1 if needed
+        totalStudents -= 1;
+        totalInstructors -= 1;
+        totalPublishedCourses -= 1;
+
+        return res.status(200).json({
+            totalStudents,
+            totalInstructors,
+            totalPublishedCourses,
+            completionRate,
+            overallRating
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Failed to fetch data for hero section",
+        });
     }
-
-    // Subtract 1 if needed
-    totalStudents -= 1;
-    totalInstructors -= 1;
-    totalPublishedCourses -= 1;
-
-    return res.status(200).json({
-      totalStudents,
-      totalInstructors,
-      totalPublishedCourses,
-      completionRate,
-      overallRating
-    });
-
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Failed to fetch data for hero section",
-    });
-  }
 };
 
 
 
 //send reviews for cta section
 export const getreviews = async (req, res) => {
-  try {
-    const courses = await Course.find({ isPublished: true })
-      .populate({
-        path: "reviews.student",
-        select: "name photoUrl"
-      })
-      .select("courseTitle reviews");
+    try {
+        const courses = await Course.find({ isPublished: true })
+            .populate({
+                path: "reviews.student",
+                select: "name photoUrl"
+            })
+            .select("courseTitle reviews");
 
-    let allReviews = [];
+        let allReviews = [];
 
-    // Collect all reviews with formatted structure
-    courses.forEach(course => {
-      course.reviews.forEach(review => {
-        allReviews.push({
-          student: review.student?.name || "Unknown",
-          rating: review.rating,
-          comment: review.comment,
-          course: course.courseTitle,
-          photoUrl: review.student?.photoUrl || null
+        // Collect all reviews with formatted structure
+        courses.forEach(course => {
+            course.reviews.forEach(review => {
+                allReviews.push({
+                    student: review.student?.name || "Unknown",
+                    rating: review.rating,
+                    comment: review.comment,
+                    course: course.courseTitle,
+                    photoUrl: review.student?.photoUrl || null
+                });
+            });
         });
-      });
-    });
 
-    // Sort by highest rating first
-    allReviews.sort((a, b) => b.rating - a.rating);
+        // Sort by highest rating first
+        allReviews.sort((a, b) => b.rating - a.rating);
 
-    // Take top 3 reviews
-    const top3 = allReviews.slice(0, 3);
+        // Take top 3 reviews
+        const top3 = allReviews.slice(0, 3);
 
-    return res.status(200).json({
-      reviews: top3
-    });
+        return res.status(200).json({
+            reviews: top3
+        });
 
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Failed to fetch reviews",
-    });
-  }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Failed to fetch reviews",
+        });
+    }
 };
 
 
@@ -1185,6 +1228,32 @@ export const getCourseInfo = async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 }
+
+
+//send weekly digest
+export const sendWeeklyDigest = async () => {
+    try {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const courses = await Course.find({
+            isPublished: true,
+            publishedAt: { $gte: oneWeekAgo },
+        }).populate("creator");
+
+        if (!courses.length) return;
+
+        const users = await User.find({
+            "notificationPreferences.weeklyDigest": true
+        });
+
+        await sendWeeklyDigestEmail(users, courses);
+
+    } catch (err) {
+        console.error("Error in sending weekly digest:", err);
+    }
+};
+
 
 
 

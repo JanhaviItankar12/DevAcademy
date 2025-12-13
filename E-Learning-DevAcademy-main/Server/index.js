@@ -4,6 +4,7 @@ import connectDB from "./database/dbConnect.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
+import "./utils/weeklyDigest.cron.js";
 
 
 //routes

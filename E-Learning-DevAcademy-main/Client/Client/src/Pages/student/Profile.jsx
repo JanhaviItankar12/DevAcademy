@@ -3,14 +3,15 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { BookOpen, Edit, Eye, GraduationCap, Loader2, Plus, Save, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BookOpen, Edit, Eye, GraduationCap, Loader2, Plus, Save, Users, ChevronLeft, ChevronRight, Bell } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import Course from './Course'
-import { useLoadUserQuery, useUpdateUserMutation } from '@/features/api/authApi'
+import { useLoadUserQuery, useUpdatePreferenceMutation, useUpdateUserMutation } from '@/features/api/authApi'
 import { toast } from 'sonner'
 import { useGetCreatorCoursesQuery, useGetEnrolledCourseOfUserQuery } from '@/features/api/courseApi'
 import { useNavigate } from 'react-router-dom'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import { Switch } from '@/components/ui/switch'
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -20,20 +21,29 @@ const Profile = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const coursesPerPage = 6;
 
+    // Notification preferences state
+    const [notificationPreferences, setNotificationPreferences] = useState({
+        newCourse: true,
+        followedInstructor: true,
+        weeklyDigest: true,
+        noMails: false
+    });
+
     const { data, isLoading, refetch } = useLoadUserQuery();
     const [updateUser, { data: updateUserdata, isLoading: updateUserisLoading, isError, isSuccess }] = useUpdateUserMutation();
     const { data: courseEnrolledData } = useGetEnrolledCourseOfUserQuery();
     const { data: createdCoursesData } = useGetCreatorCoursesQuery();
+    const [updatePreference, { isLoading: isUpdatingPreferences }] = useUpdatePreferenceMutation();
 
     useEffect(() => {
         if (data?.user?.name) {
             setName(data.user.name);
         }
-    }, [data]);
-
-    useEffect(() => {
         if (data?.user?.photoUrl) {
             setPhotoUrl(data.user.photoUrl);
+        }
+        if (data?.user?.notificationPreferences) {
+            setNotificationPreferences(data.user.notificationPreferences);
         }
     }, [data]);
 
@@ -73,6 +83,35 @@ const Profile = () => {
             toast.error("Failed to update profile");
         }
     }
+
+    const handlePreferenceChange = (key) => {
+        if (key === 'noMails') {
+            // If noMails is enabled, disable all other options
+            setNotificationPreferences(prev => ({
+                newCourse: false,
+                followedInstructor: false,
+                weeklyDigest: false,
+                noMails: !prev.noMails
+            }));
+        } else {
+            // If enabling any other option, disable noMails
+            setNotificationPreferences(prev => ({
+                ...prev,
+                [key]: !prev[key],
+                noMails: false
+            }));
+        }
+    };
+
+    const saveNotificationPreferences = async () => {
+        try {
+            const res = await updatePreference(notificationPreferences).unwrap();
+            toast.success(res.message || "Notification preferences updated");
+            refetch();
+        } catch (error) {
+            toast.error("Failed to update notification preferences");
+        }
+    };
 
     // Loading state
     if (isLoading || !data?.user) {
@@ -164,11 +203,11 @@ const Profile = () => {
                                 </div>
                             </div>
 
-                            {/* Edit Profile Button */}
-                            <div className='pt-4'>
+                            {/* Edit Profile & Notification Buttons */}
+                            <div className='flex flex-wrap gap-3 pt-4'>
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button size='lg' className='bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'>
+                                        <Button size='lg' className='bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300'>
                                             <Edit className='mr-2 h-4 w-4' />
                                             Edit Profile
                                         </Button>
@@ -219,6 +258,134 @@ const Profile = () => {
                                                     <>
                                                         <Save className='mr-2 h-4 w-4' />
                                                         Save Changes
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+
+                                {/* Notification Preferences Button */}
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button 
+                                            variant="outline" 
+                                            size="lg"
+                                            className='border-purple-300 hover:bg-purple-50 hover:border-purple-400'
+                                        >
+                                            <Bell className='mr-2 h-4 w-4' />
+                                            Notification Settings
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className='sm:max-w-lg'>
+                                        <DialogHeader>
+                                            <DialogTitle className='text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2'>
+                                                <Bell className='h-6 w-6 text-purple-600' />
+                                                Notification Preferences
+                                            </DialogTitle>
+                                            <DialogDescription className='text-gray-600 dark:text-gray-300'>
+                                                Manage your email notification settings
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        
+                                        <div className='py-4 space-y-6'>
+                                            <div className='space-y-4'>
+                                                <div className='flex items-center justify-between'>
+                                                    <div className='flex-1'>
+                                                        <h3 className='font-medium text-gray-900 dark:text-white'>New Courses</h3>
+                                                        <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                            Get notified about new courses added to the platform
+                                                        </p>
+                                                    </div>
+                                                    <Switch
+                                                        checked={notificationPreferences.newCourse}
+                                                        onCheckedChange={() => handlePreferenceChange('newCourse')}
+                                                        disabled={notificationPreferences.noMails}
+                                                        className='data-[state=checked]:bg-purple-600'
+                                                    />
+                                                </div>
+
+                                                <div className='flex items-center justify-between'>
+                                                    <div className='flex-1'>
+                                                        <h3 className='font-medium text-gray-900 dark:text-white'>Followed Instructors</h3>
+                                                        <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                            Updates from instructors you follow
+                                                        </p>
+                                                    </div>
+                                                    <Switch
+                                                        checked={notificationPreferences.followedInstructor}
+                                                        onCheckedChange={() => handlePreferenceChange('followedInstructor')}
+                                                        disabled={notificationPreferences.noMails}
+                                                        className='data-[state=checked]:bg-purple-600'
+                                                    />
+                                                </div>
+
+                                                <div className='flex items-center justify-between'>
+                                                    <div className='flex-1'>
+                                                        <h3 className='font-medium text-gray-900 dark:text-white'>Weekly Digest</h3>
+                                                        <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                            Weekly summary of your learning activities
+                                                        </p>
+                                                    </div>
+                                                    <Switch
+                                                        checked={notificationPreferences.weeklyDigest}
+                                                        onCheckedChange={() => handlePreferenceChange('weeklyDigest')}
+                                                        disabled={notificationPreferences.noMails}
+                                                        className='data-[state=checked]:bg-purple-600'
+                                                    />
+                                                </div>
+
+                                                <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
+                                                    <div className='flex items-center justify-between'>
+                                                        <div className='flex-1'>
+                                                            <h3 className='font-medium text-gray-900 dark:text-white'>Unsubscribe from all</h3>
+                                                            <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                                Stop all email notifications from the platform
+                                                            </p>
+                                                        </div>
+                                                        <Switch
+                                                            checked={notificationPreferences.noMails}
+                                                            onCheckedChange={() => handlePreferenceChange('noMails')}
+                                                            className='data-[state=checked]:bg-red-600'
+                                                        />
+                                                    </div>
+                                                    {notificationPreferences.noMails && (
+                                                        <p className='text-sm text-red-500 mt-2'>
+                                                            All email notifications are currently disabled
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className='bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg'>
+                                                <h4 className='font-medium text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2'>
+                                                    <Bell className='h-4 w-4' />
+                                                    Current Settings
+                                                </h4>
+                                                <div className='text-sm text-purple-600 dark:text-purple-400 space-y-1'>
+                                                    <p>• New Courses: {notificationPreferences.newCourse ? 'Enabled' : 'Disabled'}</p>
+                                                    <p>• Followed Instructors: {notificationPreferences.followedInstructor ? 'Enabled' : 'Disabled'}</p>
+                                                    <p>• Weekly Digest: {notificationPreferences.weeklyDigest ? 'Enabled' : 'Disabled'}</p>
+                                                    <p>• Email Status: {notificationPreferences.noMails ? 'All disabled' : 'Active'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <DialogFooter>
+                                            <Button
+                                                onClick={saveNotificationPreferences}
+                                                disabled={isUpdatingPreferences}
+                                                className='w-full cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
+                                            >
+                                                {isUpdatingPreferences ? (
+                                                    <>
+                                                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className='mr-2 h-4 w-4' />
+                                                        Save Preferences
                                                     </>
                                                 )}
                                             </Button>
