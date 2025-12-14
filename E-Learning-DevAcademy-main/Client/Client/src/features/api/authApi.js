@@ -38,6 +38,22 @@ export const authApi = createApi({
                 }
             }
         }),
+
+        forgotPassword:builder.mutation({
+            query:(email)=>({
+              url:"/forgot-password",
+              method:'POST',
+              body:{email}
+            })
+        }),
+
+        resetPassword:builder.mutation({
+            query:({token,password})=>({
+               url:`reset-password/${token}`,
+               method:'POST',
+               body:{password}
+            })
+        }),
         //logout user
         loggedOutUser: builder.mutation({
             query: () => ({
@@ -210,6 +226,8 @@ export const {
     useLoadUserQuery,
     useUpdateUserMutation,
     useLoggedOutUserMutation,
+    useForgotPasswordMutation,
+    useResetPasswordMutation,
     useGetCurrentUserQuery,
     useGetAdminDataQuery,
     useStudDashboardQuery,

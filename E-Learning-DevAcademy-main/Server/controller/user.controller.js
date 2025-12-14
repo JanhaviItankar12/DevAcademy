@@ -5,7 +5,8 @@ import { deleteMedia, uploadMedia } from "../utils/cloudinary.js";
 import { Course } from "../models/course.model.js";
 import { Certificate } from "../models/certificate.model.js";
 import { CourseProgress } from "../models/courseProgress.model.js";
-import { sendReplyEmail } from "../utils/sendEmail.js";
+import { sendForgotPasswordEmail, sendReplyEmail } from "../utils/sendEmail.js";
+import { generateResetToken } from "../utils/generateResetToken.js";
 
 
 
@@ -204,7 +205,9 @@ export const logout = async (_, res) => {
 //forogt-password
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.body.email;
+
+    
 
     const user = await User.findOne({ email });
     if (!user)
@@ -239,6 +242,8 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
+    
+
 
     const resetLink = `${process.env.frontend_url}/reset-password/${token}`;
     await sendForgotPasswordEmail(email, resetLink);
@@ -256,7 +261,7 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    console.log("Reset Token From URL:", token);
+   
 
     if (!password) {
       return res.status(400).json({ message: "Password is required" });

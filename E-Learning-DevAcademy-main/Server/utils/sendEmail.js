@@ -30,7 +30,8 @@ export const sendForgotPasswordEmail = async (email, resetLink) => {
 
           <!-- Logo -->
           <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://your-domain.com/logo.svg" alt="DevAcademy Logo" style="width: 120px; height: auto;" />
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
+            alt="DevAcademy Logo" style="width: 120px; height: auto;" />
           </div>
 
           <!-- Title -->

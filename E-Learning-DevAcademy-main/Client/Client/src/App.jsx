@@ -47,6 +47,7 @@ import TermsOfService from './Pages/student/Home/Company/TermsOfService'
 import PrivacyPolicy from './Pages/student/Home/Company/PrivacyPolicy'
 import Instructors from './Pages/student/Dashboard/Instructors'
 import Messages from './Pages/MainAdmin/Messages'
+import { ResetPassword } from './Pages/ResetPassword'
 
 
 
@@ -103,6 +104,10 @@ const appRouter=createBrowserRouter([
      {
       path:"login",
       element:<Login/>
+     },
+     {
+      path:"reset-password/:token",
+      element:<ResetPassword/>
      },
     
      {

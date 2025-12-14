@@ -1,32 +1,23 @@
-import React, { useRef } from 'react';
-import JoditEditor from 'jodit-react';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
-const RichTextEditor = ({ input, setInput }) => {
-  const editor = useRef(null);
+const RichTextEditor = ({ value, setValue }) => {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: value || "",
+    editorProps: {
+      attributes: {
+        class:
+          "prose max-w-none min-h-[200px] border p-4 rounded-lg focus:outline-none",
+      },
+    },
+    onUpdate({ editor }) {
+      setValue(editor.getHTML());
+    },
+  });
 
-  return (
-    <div className="border rounded">
-      <JoditEditor
-        ref={editor}
-        value={input.description || ''}
-        onBlur={(newContent) => 
-          setInput((prev) => ({ ...prev, description: newContent }))
-        }
-        config={{
-          readonly: false,
-          placeholder: 'Enter course description...',
-          height: 400,
-          toolbarSticky: false,
-          uploader: { insertImageAsBase64URI: true },
-          buttons: [
-            'bold', 'italic', 'underline', '|',
-            'ul', 'ol', '|', 'link', 'image', 'video', '|',
-            'undo', 'redo', 'fullsize'
-          ],
-        }}
-      />
-    </div>
-  );
+  return <EditorContent editor={editor} />;
 };
 
 export default RichTextEditor;
+

@@ -9,6 +9,7 @@ import { BadgeInfo, Lock, PlayCircle, Star, ChevronLeft, ChevronRight, VideoOff,
 import React, { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
 import { useNavigate, useParams } from 'react-router-dom'
+import DOMPurify from "dompurify";
 
 const CourseDetail = () => {
     const params = useParams();
@@ -166,9 +167,13 @@ const CourseDetail = () => {
                         {/* Description */}
                         <div className='bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 p-6'>
                             <h2 className='font-bold text-2xl mb-4 text-gray-900 dark:text-white'>Description</h2>
-                            <p className='text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line'>
-                                {course?.description}
-                            </p>
+                            <p
+                                className='text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line'
+                                dangerouslySetInnerHTML={{
+                                    __html: DOMPurify.sanitize(course?.description.replace(/\n/g, "<br>") || ""),
+                                }}
+                            />
+
                         </div>
 
                         {/* Course Content */}

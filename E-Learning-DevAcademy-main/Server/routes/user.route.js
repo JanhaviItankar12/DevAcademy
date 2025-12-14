@@ -1,11 +1,12 @@
 import express from "express";
-import { allInstructors, analytics, getCompletedCourses, getCurrentUser, getUserProfile, logout, register, studentDashboardData, toggleFollowInstructor, updateNotificationPreferences, updateProfile } from "../controller/user.controller.js";
+import { allInstructors, analytics, forgotPassword, getCompletedCourses, getCurrentUser, getUserProfile, logout, register, resetPassword, studentDashboardData, toggleFollowInstructor, updateNotificationPreferences, updateProfile } from "../controller/user.controller.js";
 import { login } from "../controller/user.controller.js";
 import isAuthenticated from "../middleware/isAuthenticated.js";
 import upload from "../utils/multer.js";
 import { adminMiddleware } from "../middleware/adminMiddleware.js";
 import { createMessage, deleteMessage, getadminData, getMessages, markAsRead } from "../controller/admin.controller.js";
 import { downloadCertificate, issueCertificate } from "../controller/certificate.controller.js";
+import { forgotPasswordLimiter } from "../utils/forgotPasswrdRateLimiter.js";
 
 
 const router=express.Router();
@@ -13,6 +14,8 @@ const router=express.Router();
 router.route("/register").post(register);
 router.route("/login").post(login);
 router.route("/logout").get(logout);
+router.route("/forgot-password").post(forgotPasswordLimiter,forgotPassword);
+router.route("/reset-password/:token").post(resetPassword);
 router.route("/profile").get(isAuthenticated, getUserProfile);
 router.route("/setting/update-notify-prefernce").post(isAuthenticated,updateNotificationPreferences);
 router.route("/profile/update").put(isAuthenticated, upload.single("profilePhoto"), updateProfile);
