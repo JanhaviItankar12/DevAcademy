@@ -7,6 +7,8 @@ import { Certificate } from "../models/certificate.model.js";
 import { CourseProgress } from "../models/courseProgress.model.js";
 import { sendForgotPasswordEmail, sendReplyEmail } from "../utils/sendEmail.js";
 import { generateResetToken } from "../utils/generateResetToken.js";
+import { OAuth2Client } from "google-auth-library";
+import crypto from "crypto";
 
 
 
@@ -144,6 +146,13 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ success: false, message: "Incorrect email" });
     }
+    
+    //if user already signed with google
+    if (user.provider === "google") {
+      return res.status(400).json({
+        message: "Please login using Google, You have already signed with Google"
+      });
+    }
 
     // Password match
     const isPasswordMatch = await bcrypt.compare(password, user.password);
@@ -174,6 +183,9 @@ export const login = async (req, res) => {
         message: "Your account is still pending for admin approval",
       });
     }
+
+    
+
 
     // Generate token
     generateToken(res, user, `Welcome back ${user.name}`);
@@ -207,7 +219,7 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body.email;
 
-    
+
 
     const user = await User.findOne({ email });
     if (!user)
@@ -242,7 +254,7 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    
+
 
 
     const resetLink = `${process.env.frontend_url}/reset-password/${token}`;
@@ -261,7 +273,7 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-   
+
 
     if (!password) {
       return res.status(400).json({ message: "Password is required" });
@@ -308,6 +320,108 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
+
+
+
+//google login
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const googleLogin = async (req, res) => {
+  try {
+    const { credential, role } = req.body;
+
+    if (!credential) return res.status(400).json({ message: "Google credential missing" });
+    if (!role || !["student", "instructor"].includes(role))
+      return res.status(400).json({ message: "Invalid role" });
+
+    // Verify ID token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+
+    let user = await User.findOne({ email });
+
+    // If new user
+    if (!user) {
+      let newRole = role;
+      let isApproved = role === "student"; // Students auto-approved, instructors need approval
+
+      const randomPassword = crypto.randomBytes(20).toString("hex");
+      // Hash password
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await User.create({
+        name: payload.name,
+        email: email,
+        password: hashedPassword, // dummy password
+        photoUrl: payload.picture,
+        provider: "google",
+        role: newRole,
+        isVerified: true,
+        isApproved: isApproved,
+        reject: false,
+      });
+
+    } else {
+      // Existing user - update provider if needed
+      if (!user.provider || user.provider !== "google") {
+        user.provider = "google";
+        user.photoUrl = payload.picture;
+        await user.save();
+      }
+
+      // Check if instructor and not approved
+      if (user.role === "instructor" && !user.isApproved) {
+        return res.status(403).json({
+          message: "Your instructor account is pending admin approval",
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            isApproved: user.isApproved
+          }
+        });
+      }
+
+      
+    }
+
+    // Generate token
+    const token = generateToken(res, user, `Welcome ${user.name}`);
+
+    // Prepare user response without sensitive data
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      photoUrl: user.photoUrl,
+      isVerified: user.isVerified,
+      isApproved: user.isApproved,
+      provider: user.provider
+    };
+
+    return res.status(200).json({
+      message: user.isApproved
+        ? `Welcome ${user.name}!`
+        : `Welcome ${user.name}! Your ${user.role} account is pending approval.`,
+      token,
+      user: userResponse
+    });
+
+  } catch (error) {
+  return res.status(500).json({
+    message: "Google authentication failed"
+  });
+}
+
+};
+
 
 
 
@@ -464,9 +578,9 @@ export const studentDashboardData = async (req, res) => {
 
       const progress = totalLectures > 0
         ? Math.min(
-            100,
-            Math.round((completedCount / totalLectures) * 100)
-          )
+          100,
+          Math.round((completedCount / totalLectures) * 100)
+        )
         : 0;
 
       totalLecturesAll += totalLectures;
@@ -704,13 +818,13 @@ export const getCompletedCourses = async (req, res) => {
 
         certificate: certificate
           ? {
-              certificateId: certificate.certificateId,
-              issuedAt: certificate.issuedAt,
-              formattedIssuedAt: new Date(certificate.issuedAt).toLocaleDateString("en-GB"),
-              courseTitle: certificate.course?.courseTitle,
-              category: certificate.course?.category,
-              courseThumbnail: certificate.course?.courseThumbnail
-            }
+            certificateId: certificate.certificateId,
+            issuedAt: certificate.issuedAt,
+            formattedIssuedAt: new Date(certificate.issuedAt).toLocaleDateString("en-GB"),
+            courseTitle: certificate.course?.courseTitle,
+            category: certificate.course?.category,
+            courseThumbnail: certificate.course?.courseThumbnail
+          }
           : null
       });
     });
@@ -737,7 +851,7 @@ export const allInstructors = async (req, res) => {
       { $match: { role: "instructor" } }, // Only instructors
       {
         $lookup: {
-          from: "courses",          
+          from: "courses",
           localField: "_id",
           foreignField: "creator",
           as: "courses"
@@ -800,7 +914,7 @@ export const allInstructors = async (req, res) => {
 // Follow or Unfollow an instructor
 export const toggleFollowInstructor = async (req, res) => {
   try {
-    const studentId = req.id; 
+    const studentId = req.id;
     const { instructorId } = req.params;
 
     if (!instructorId) {
@@ -816,12 +930,12 @@ export const toggleFollowInstructor = async (req, res) => {
     const isFollowing = student.followingInstructors?.includes(instructorId);
 
     if (isFollowing) {
-      
+
       student.followingInstructors = student.followingInstructors.filter(
         id => id.toString() !== instructorId
       );
     } else {
-     
+
       student.followingInstructors = [...(student.followingInstructors || []), instructorId];
     }
 
@@ -845,7 +959,7 @@ export const updateNotificationPreferences = async (req, res) => {
     const userId = req.id;
     const { notificationPreferences } = req.body;
 
-    
+
 
     let preferences = {};
 

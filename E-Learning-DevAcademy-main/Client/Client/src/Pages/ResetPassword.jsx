@@ -189,7 +189,7 @@ export function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen  mt-8 bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8">

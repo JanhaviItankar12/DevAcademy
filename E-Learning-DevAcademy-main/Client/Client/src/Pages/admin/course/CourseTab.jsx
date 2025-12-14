@@ -390,13 +390,27 @@ const CourseTab = () => {
               className={isEmpty(input.subTitle) ? "border-red-300" : ""}
             />
           </div>
-          <div className='space-y-3'>
-            <Label>Description <span className="text-red-500">*</span></Label>
-            <RichTextEditor input={input} setInput={setInput} />
-            {(isEmpty(input.description) || input.description === "<p></p>") && (
-              <p className="text-sm text-red-500">Description is required</p>
-            )}
-          </div>
+          <div className="space-y-3">
+  <Label>
+    Description <span className="text-red-500">*</span>
+  </Label>
+
+  <RichTextEditor
+  value={input.description}
+  setValue={(html) =>
+    setInput((prev) => ({
+      ...prev,
+      description: html,
+    }))
+  }
+/>
+
+
+  {(isEmpty(input.description) || input.description === "<p></p>") && (
+    <p className="text-sm text-red-500">Description is required</p>
+  )}
+</div>
+
           <div className='flex items-center gap-5'>
             <div className='space-y-3'>
               <Label>Category <span className="text-red-500">*</span></Label>

@@ -1,5 +1,5 @@
 import express from "express";
-import { allInstructors, analytics, forgotPassword, getCompletedCourses, getCurrentUser, getUserProfile, logout, register, resetPassword, studentDashboardData, toggleFollowInstructor, updateNotificationPreferences, updateProfile } from "../controller/user.controller.js";
+import { allInstructors, analytics, forgotPassword, getCompletedCourses, getCurrentUser, getUserProfile, googleLogin, logout, register, resetPassword, studentDashboardData, toggleFollowInstructor, updateNotificationPreferences, updateProfile } from "../controller/user.controller.js";
 import { login } from "../controller/user.controller.js";
 import isAuthenticated from "../middleware/isAuthenticated.js";
 import upload from "../utils/multer.js";
@@ -13,6 +13,7 @@ const router=express.Router();
 
 router.route("/register").post(register);
 router.route("/login").post(login);
+router.route("/google-login").post(googleLogin);
 router.route("/logout").get(logout);
 router.route("/forgot-password").post(forgotPasswordLimiter,forgotPassword);
 router.route("/reset-password/:token").post(resetPassword);

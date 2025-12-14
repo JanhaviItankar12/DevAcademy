@@ -169,9 +169,7 @@ const CourseDetail = () => {
                             <h2 className='font-bold text-2xl mb-4 text-gray-900 dark:text-white'>Description</h2>
                             <p
                                 className='text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line'
-                                dangerouslySetInnerHTML={{
-                                    __html: DOMPurify.sanitize(course?.description.replace(/\n/g, "<br>") || ""),
-                                }}
+                                dangerouslySetInnerHTML={{__html:course.description}}
                             />
 
                         </div>

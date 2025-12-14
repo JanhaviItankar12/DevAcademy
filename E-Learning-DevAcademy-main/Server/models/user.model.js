@@ -29,6 +29,8 @@ const userSchema = mongoose.Schema({
         type: String,
         default: "https://github.com/shadcn.png"
     },
+
+    //for instructor
     isApproved: {
         type: Boolean,
         default: false
@@ -66,12 +68,28 @@ const userSchema = mongoose.Schema({
         noMails: { type: Boolean, default: false }
     },
 
-     followingInstructors: [
+    followingInstructors: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         }
     ],
+
+    provider: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local"
+    },
+
+
+    isVerified: {
+        type: Boolean,
+        default: false
+    }  //for google verified email
+
+
+
+
 
 
 

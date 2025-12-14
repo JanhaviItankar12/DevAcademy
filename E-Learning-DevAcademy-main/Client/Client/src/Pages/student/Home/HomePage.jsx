@@ -135,7 +135,7 @@ export default function HomePage() {
               Earn Certificates, Build Your Future
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join 50,000+ students learning from industry professionals. Access 200+ courses across all levels - Beginner, Medium, and Advanced. Get certified and boost your career.
+              Join {dataForHeroSection?.totalStudents}+ students learning from industry professionals. Access {dataForHeroSection?.totalPublishedCourses}+ courses across all levels - Beginner, Medium, and Advanced. Get certified and boost your career.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <button onClick={handleExploreCourses} className="px-8 cursor-pointer py-4 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all font-semibold text-lg shadow-lg">

@@ -54,6 +54,17 @@ export const authApi = createApi({
                body:{password}
             })
         }),
+
+        //goggle login
+        googleLogin:builder.mutation({
+            query:({credential,role})=>({
+              url:"/google-login",
+              method:'POST',
+              body:{credential,role}
+            })
+        }),
+
+
         //logout user
         loggedOutUser: builder.mutation({
             query: () => ({
@@ -228,6 +239,7 @@ export const {
     useLoggedOutUserMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,
+    useGoogleLoginMutation,
     useGetCurrentUserQuery,
     useGetAdminDataQuery,
     useStudDashboardQuery,

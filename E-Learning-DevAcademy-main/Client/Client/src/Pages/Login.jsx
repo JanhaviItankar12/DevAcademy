@@ -1,31 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Mail, Lock, User, Shield, Eye, EyeOff, Loader2, AlertCircle, X } from 'lucide-react';
-import { useLoginUserMutation, useRegisterUserMutation, useForgotPasswordMutation } from '@/features/api/authApi';
+import { Mail, Lock, User, Shield, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft, X } from 'lucide-react';
+import { useLoginUserMutation, useRegisterUserMutation, useForgotPasswordMutation, useGoogleLoginMutation } from '@/features/api/authApi';
 import { toast } from 'sonner';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { userLoggedIn } from '@/features/authSlice';
+import { GoogleLogin } from '@react-oauth/google';
 
-export function Login() {
+export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("student");
   const [loginInput, setLoginInput] = useState({ email: "", password: "", role: "student" });
   const [signupInput, setSignupInput] = useState({ name: "", email: "", password: "", role: "student" });
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [errors, setErrors] = useState({});
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [] });
-  
-  // State for tracking which flow is active
-  const [activeFlow, setActiveFlow] = useState("login"); // login, signup, forgotPassword
+  const [activeFlow, setActiveFlow] = useState("login");
+  const [tab, setTab] = useState("login");
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [googleRole, setGoogleRole] = useState("student");
 
   // API mutations
   const [registerUser, { isLoading: registeredLoading }] = useRegisterUserMutation();
   const [loginUser, { isLoading: loginIsLoading }] = useLoginUserMutation();
   const [forgotPassword, { isLoading: forgotPasswordLoading }] = useForgotPasswordMutation();
+  const [googleLogin] = useGoogleLoginMutation();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const [tab, setTab] = useState("login");
   const from = location.state?.from?.pathname || "/";
 
   useEffect(() => {
@@ -81,14 +84,10 @@ export function Login() {
 
   const changeInputHandler = (e, type) => {
     const { name, value } = e.target;
-    
-    // Clear error for this field
     setErrors(prev => ({ ...prev, [name]: '' }));
 
     if (type === "signup") {
       setSignupInput({ ...signupInput, [name]: value });
-      
-      // Real-time password strength check
       if (name === 'password') {
         const strength = checkPasswordStrength(value);
         setPasswordStrength(strength);
@@ -100,7 +99,7 @@ export function Login() {
 
   const validateForm = (type) => {
     const newErrors = {};
-    
+
     if (type === "forgotPassword") {
       if (!forgotPasswordEmail || forgotPasswordEmail.trim() === '') {
         newErrors.email = 'Email is required';
@@ -173,7 +172,7 @@ export function Login() {
 
     try {
       const result = await action(inputData).unwrap();
-      
+
       if (result) {
         if (type === "signup") {
           setTab("login");
@@ -186,7 +185,7 @@ export function Login() {
             user: result.user,
             token: result.token
           }));
-          
+
           localStorage.setItem("token", result.token);
           localStorage.setItem("user", JSON.stringify(result.user));
           navigate(from, { replace: true });
@@ -217,15 +216,35 @@ export function Login() {
     }
   };
 
-  // Google Sign-In Handler
-  const handleGoogleSignIn = async (type = "login") => {
+  // Google handle function
+  const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      const redirectUrl = `${backendUrl}/api/auth/google?flow=${type}`;
-      window.location.href = redirectUrl;
+      const result = await googleLogin({
+        credential: credentialResponse.credential,
+        role: googleRole, // Use the role selected in modal
+      }).unwrap();
+
+      if (result.user.role === "instructor" && !result.user.isApproved) {
+        toast.info("Your instructor account is pending admin approval");
+        setShowGoogleModal(false);
+        return;
+      }
+
+      dispatch(userLoggedIn({
+        user: result.user,
+        token: result.token,
+      }));
+
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
+
+      navigate(from, { replace: true });
+      toast.success(result.message || "Login successful");
+      setShowGoogleModal(false);
+
     } catch (error) {
-      toast.error("Google sign-in failed");
-      console.error("Google sign-in error:", error);
+      toast.error(error?.data?.message || "Google login failed");
+      setShowGoogleModal(false);
     }
   };
 
@@ -243,46 +262,40 @@ export function Login() {
     return 'Strong';
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Form Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
-          
-          {/* Back button for forgot password flow */}
-          {activeFlow === "forgotPassword" && (
-            <button
-              onClick={() => setActiveFlow("login")}
-              className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6 cursor-pointer"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-              </svg>
-              Back to Login
-            </button>
-          )}
+  // Custom Google button click handler
+  const handleCustomGoogleClick = () => {
+    setShowGoogleModal(true);
+    setGoogleRole("student"); // Reset to default
+  };
 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl p-6">
+          
           {/* Forgot Password Flow */}
           {activeFlow === "forgotPassword" && (
-            <div className="space-y-5">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                  </svg>
+            <div className="space-y-4">
+              <button
+                onClick={() => setActiveFlow("login")}
+                className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm font-medium">Back to Login</span>
+              </button>
+
+              <div className="text-center mb-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Lock className="w-6 h-6 text-purple-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Reset Password</h2>
-                <p className="text-gray-600 text-sm">
-                  Enter your email address and we'll send you a link to reset your password.
-                </p>
+                <h2 className="text-xl font-bold text-gray-900">Reset Password</h2>
+                <p className="text-gray-600 text-sm mt-1">We'll send you a reset link</p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="email"
                     value={forgotPasswordEmail}
@@ -290,27 +303,25 @@ export function Login() {
                       setForgotPasswordEmail(e.target.value);
                       setErrors(prev => ({ ...prev, email: '' }));
                     }}
-                    placeholder="Enter your email"
-                    className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                      errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
+                    placeholder="your@email.com"
+                    className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                      errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                     }`}
                   />
                 </div>
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <X className="w-4 h-4" /> {errors.email}
-                  </p>
+                  <p className="mt-1 text-xs text-red-500">{errors.email}</p>
                 )}
               </div>
 
               <button
                 onClick={handleForgotPassword}
                 disabled={forgotPasswordLoading}
-                className="w-full py-4 bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {forgotPasswordLoading ? (
                   <span className="flex items-center justify-center">
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Sending...
                   </span>
                 ) : (
@@ -320,21 +331,102 @@ export function Login() {
             </div>
           )}
 
+          {/* Google Login Modal */}
+          {showGoogleModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Continue with Google</h3>
+                  <button
+                    onClick={() => setShowGoogleModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <p className="text-gray-600 text-lg mb-6">
+                  Please select your role first, then sign in with Google:
+                </p>
+                
+                {/* Role Selection */}
+                <div className="space-y-4 mb-6">
+                  <div 
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${googleRole === "student" ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    onClick={() => setGoogleRole("student")}
+                  >
+                    <div className="flex items-center">
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${googleRole === "student" ? 'border-purple-500' : 'border-gray-300'}`}>
+                        {googleRole === "student" && <div className="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>}
+                      </div>
+                      <div>
+                        <span className="font-medium block">Student</span>
+                        <p className="text-xs text-gray-500 mt-1">Access courses and learn</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${googleRole === "instructor" ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    onClick={() => setGoogleRole("instructor")}
+                  >
+                    <div className="flex items-center">
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${googleRole === "instructor" ? 'border-purple-500' : 'border-gray-300'}`}>
+                        {googleRole === "instructor" && <div className="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>}
+                      </div>
+                      <div>
+                        <span className="font-medium block">Instructor</span>
+                        <p className="text-xs text-gray-500 mt-1">Create and manage courses</p>
+                        {googleRole === "instructor" && (
+                          <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                            <AlertCircle className="inline w-3 h-3 mr-1" />
+                            Requires admin approval (3-5 business days)
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Google Login Button INSIDE Modal */}
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => {
+                      toast.error("Google sign-in failed");
+                      setShowGoogleModal(false);
+                    }}
+                    shape="rectangular"
+                    text="signin_with"
+                    size="large"
+                  />
+                </div>
+                
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setShowGoogleModal(false)}
+                    className="text-sm cursor-pointer text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Login/Signup Flow */}
           {(activeFlow === "login" || activeFlow === "signup") && (
             <>
               {/* Tab Switcher */}
-              <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-full">
+              <div className="flex gap-2 mb-5 bg-gray-100 p-1 rounded-lg">
                 <button
                   onClick={() => {
                     setTab('login');
                     setActiveFlow('login');
                     setErrors({});
                   }}
-                  className={`flex-1 py-3 px-6 rounded-full cursor-pointer font-semibold transition-all ${
-                    tab === 'login'
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'text-gray-600 hover:text-purple-600'
+                  className={`flex-1 py-2 rounded-md font-semibold text-lg transition-all cursor-pointer ${
+                    tab === 'login' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-600 hover:text-purple-600'
                   }`}
                 >
                   Login
@@ -346,125 +438,105 @@ export function Login() {
                     setErrors({});
                     setPasswordStrength({ score: 0, feedback: [] });
                   }}
-                  className={`flex-1 py-3 px-6 cursor-pointer rounded-full font-semibold transition-all ${
-                    tab === 'signup'
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'text-gray-600 hover:text-purple-600'
+                  className={`flex-1 py-2 rounded-md font-semibold text-lg cursor-pointer transition-all ${
+                    tab === 'signup' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-600 hover:text-purple-600'
                   }`}
                 >
                   Sign Up
                 </button>
               </div>
 
-              {/* Google Sign-In Button */}
-              <div className="mb-6">
+              {/* Custom Google Login Button on Main Page */}
+              <div className="mb-4">
                 <button
-                  onClick={() => handleGoogleSignIn(tab)}
-                  className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={handleCustomGoogleClick}
+                  className="w-full py-2.5 px-4 border cursor-pointer border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 mb-3"
                 >
-                  <img 
-                    src="https://www.google.com/favicon.ico" 
-                    alt="Google" 
-                    className="w-5 h-5"
-                  />
-                  <span className="font-semibold text-gray-700">
-                    Continue with Google
-                  </span>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  <span className="text-lg font-medium">Continue with Google</span>
                 </button>
-                
-                <div className="flex items-center my-6">
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                  <span className="px-4 text-gray-500 text-sm">Or continue with</span>
-                  <div className="flex-1 h-px bg-gray-200"></div>
+
+                <div className="flex items-center my-3">
+                  <div className="flex-grow border-t border-gray-300"></div>
+                  <span className="mx-3 text-gray-500 text-xs">OR</span>
+                  <div className="flex-grow border-t border-gray-300"></div>
                 </div>
               </div>
 
               {/* Login Form */}
               {tab === 'login' && (
-                <div className="space-y-5">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back!</h2>
-                    <p className="text-gray-600 text-sm">Login to continue your learning journey</p>
+                <div className="space-y-3.5">
+                  <div className="mb-3">
+                    <h2 className="text-xl font-bold text-gray-900">Welcome Back!</h2>
+                    <p className="text-gray-600 text-sm">Continue your learning journey</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="email"
                         name="email"
                         value={loginInput.email}
                         onChange={(e) => changeInputHandler(e, 'login')}
-                        placeholder="Enter your email"
-                        className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                          errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
+                        placeholder="your@email.com"
+                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                          errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
                     </div>
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                        <X className="w-4 h-4" /> {errors.email}
-                      </p>
-                    )}
+                    {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Password <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
                         value={loginInput.password}
                         onChange={(e) => changeInputHandler(e, 'login')}
-                        placeholder="Enter your password"
-                        className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                          errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
+                        placeholder="Enter password"
+                        className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                          errors.password ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    {errors.password && (
-                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                        <X className="w-4 h-4" /> {errors.password}
-                      </p>
-                    )}
+                    {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                   </div>
 
-                  {/* Forgot Password Link */}
                   <div className="flex justify-end">
                     <button
                       onClick={() => setActiveFlow("forgotPassword")}
-                      className="text-sm text-purple-600 hover:text-purple-700 font-medium cursor-pointer"
+                      className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer font-medium"
                     >
                       Forgot Password?
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Login As <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Login As</label>
                     <div className="relative">
-                      <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <select
                         name="role"
                         value={loginInput.role}
                         onChange={(e) => changeInputHandler(e, 'login')}
-                        className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors appearance-none cursor-pointer ${
-                          errors.role ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
-                        }`}
+                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none"
                       >
                         <option value="student">Student</option>
                         <option value="instructor">Instructor</option>
@@ -476,15 +548,15 @@ export function Login() {
                   <button
                     onClick={() => handleRegistration('login')}
                     disabled={loginIsLoading}
-                    className="w-full py-4 bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2.5 cursor-pointer text-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {loginIsLoading ? (
                       <span className="flex items-center justify-center">
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Please wait...
                       </span>
                     ) : (
-                      'Login to Account'
+                      'Login'
                     )}
                   </button>
 
@@ -496,9 +568,9 @@ export function Login() {
                         setActiveFlow('signup');
                         setErrors({});
                       }}
-                      className="text-purple-600 cursor-pointer font-semibold hover:text-purple-700"
+                      className="text-purple-600 cursor-pointer text-sm font-semibold hover:text-purple-700"
                     >
-                      Sign up now
+                      Sign up
                     </button>
                   </p>
                 </div>
@@ -506,96 +578,81 @@ export function Login() {
 
               {/* Signup Form */}
               {tab === 'signup' && (
-                <div className="space-y-5">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-1">Create Account</h2>
-                    <p className="text-gray-600 text-sm">Start your learning journey today</p>
+                <div className="space-y-3.5">
+                  <div className="mb-3">
+                    <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
+                    <p className="text-gray-600 text-sm">Start your learning journey</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Full Name <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="text"
                         name="name"
                         value={signupInput.name}
                         onChange={(e) => changeInputHandler(e, 'signup')}
-                        placeholder="Enter your name"
-                        className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                          errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
+                        placeholder="John Doe"
+                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                          errors.name ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
                     </div>
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                        <X className="w-4 h-4" /> {errors.name}
-                      </p>
-                    )}
+                    {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="email"
                         name="email"
                         value={signupInput.email}
                         onChange={(e) => changeInputHandler(e, 'signup')}
-                        placeholder="Enter your email"
-                        className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                          errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
+                        placeholder="your@email.com"
+                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                          errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
                     </div>
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                        <X className="w-4 h-4" /> {errors.email}
-                      </p>
-                    )}
+                    {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Password <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
                         value={signupInput.password}
                         onChange={(e) => changeInputHandler(e, 'signup')}
-                        placeholder="Create a strong password"
-                        className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                          errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
+                        placeholder="Create strong password"
+                        className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                          errors.password ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    
-                    {/* Password Strength Indicator */}
+
                     {signupInput.password && (
-                      <div className="mt-2">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full transition-all duration-300 ${getPasswordStrengthColor(passwordStrength.score)}`}
+                      <div className="mt-1.5">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all ${getPasswordStrengthColor(passwordStrength.score)}`}
                               style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
                             ></div>
                           </div>
-                          <span className={`text-xs font-semibold ${
+                          <span className={`text-xs font-medium ${
                             passwordStrength.score <= 2 ? 'text-red-500' :
                             passwordStrength.score === 3 ? 'text-yellow-500' :
                             passwordStrength.score === 4 ? 'text-blue-500' : 'text-green-500'
@@ -604,90 +661,41 @@ export function Login() {
                           </span>
                         </div>
                         {passwordStrength.feedback.length > 0 && (
-                          <div className="text-xs text-gray-600 space-y-1">
-                            <p className="font-semibold">Password must include:</p>
-                            {passwordStrength.feedback.map((item, idx) => (
-                              <p key={idx} className="flex items-center gap-1">
-                                <X className="w-3 h-3 text-red-500" /> {item}
-                              </p>
-                            ))}
-                          </div>
+                          <p className="text-xs text-gray-600">
+                            Need: {passwordStrength.feedback.join(', ')}
+                          </p>
                         )}
                       </div>
                     )}
-                    
-                    {errors.password && (
-                      <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                        <X className="w-4 h-4" /> {errors.password}
-                      </p>
-                    )}
+                    {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Sign Up As <span className="text-red-500">*</span>
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Sign Up As</label>
                     <div className="relative">
-                      <Shield className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <select
                         name="role"
                         value={signupInput.role}
                         onChange={(e) => changeInputHandler(e, 'signup')}
-                        className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors appearance-none cursor-pointer ${
-                          errors.role ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-600'
-                        }`}
+                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none"
                       >
                         <option value="student">Student</option>
                         <option value="instructor">Instructor</option>
-                        <option value="admin">Admin</option>
                       </select>
                     </div>
                   </div>
 
-                  {/* Instructor Guidelines - Shows when instructor is selected */}
                   {signupInput.role === 'instructor' && (
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-purple-200 rounded-2xl p-6 space-y-4">
-                      <div className="flex items-center gap-2 text-purple-700 mb-3">
-                        <AlertCircle className="w-6 h-6" />
-                        <h3 className="font-bold text-lg">Instructor Approval Process</h3>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex gap-3">
-                          <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">
-                            1
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">Sign Up</p>
-                            <p className="text-gray-600 text-xs">Create your instructor account</p>
-                          </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-blue-900 mb-1">Instructor Approval Required</p>
+                          <p className="text-sm text-blue-700 leading-relaxed">
+                            Admin will review your account within 3-5 business days. You'll receive an email once approved to start creating courses.
+                          </p>
                         </div>
-
-                        <div className="flex gap-3">
-                          <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">
-                            2
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">Admin Review</p>
-                            <p className="text-gray-600 text-xs">Wait 3-5 business days for approval</p>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                          <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm">
-                            3
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">Start Teaching</p>
-                            <p className="text-gray-600 text-xs">Login and create your courses</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-green-100 border border-green-300 rounded-xl p-3 mt-4">
-                        <p className="text-green-800 text-xs font-semibold">
-                          ✓ Earn 70% revenue share • Reach 1000+ students • Build your portfolio
-                        </p>
                       </div>
                     </div>
                   )}
@@ -695,11 +703,11 @@ export function Login() {
                   <button
                     onClick={() => handleRegistration('signup')}
                     disabled={registeredLoading}
-                    className="w-full py-4 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2.5 bg-gradient-to-r text-lg cursor-pointer from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {registeredLoading ? (
                       <span className="flex items-center justify-center">
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Please wait...
                       </span>
                     ) : (
@@ -716,9 +724,9 @@ export function Login() {
                         setErrors({});
                         setPasswordStrength({ score: 0, feedback: [] });
                       }}
-                      className="text-purple-600 font-semibold cursor-pointer hover:text-purple-700"
+                      className="text-purple-600  cursor-pointer text-sm font-semibold hover:text-purple-700"
                     >
-                      Login here
+                      Login
                     </button>
                   </p>
                 </div>

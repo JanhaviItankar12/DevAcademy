@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import './App.css'
-import { Login } from './Pages/Login'
+
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import MainLayout from './layout/MainLayout'
@@ -48,224 +49,230 @@ import PrivacyPolicy from './Pages/student/Home/Company/PrivacyPolicy'
 import Instructors from './Pages/student/Dashboard/Instructors'
 import Messages from './Pages/MainAdmin/Messages'
 import { ResetPassword } from './Pages/ResetPassword'
+import Login from './Pages/Login';
 
 
 
 
 
 
-const appRouter=createBrowserRouter([
+const appRouter = createBrowserRouter([
   {
-    path:"/",
-    element:<MainLayout/>,
-    children:[
+    path: "/",
+    element: <MainLayout />,
+    children: [
       {
-      path:"/",
-      element:
-      <>
-      <HomePage/>
-      
-      </>
+        path: "/",
+        element:
+          <>
+            <HomePage />
+
+          </>
       },
       {
-       path:"about-us",
-       element:<AboutUs/>
+        path: "about-us",
+        element: <AboutUs />
       },
-       {
-       path:"contact",
-       element:<ContactUs/>
+      {
+        path: "contact",
+        element: <ContactUs />
       },
-       {
-       path:"terms-and-conditions",
-       element:<TermsOfService/>
+      {
+        path: "terms-and-conditions",
+        element: <TermsOfService />
       },
-       {
-       path:"privacy-policy",
-       element:<PrivacyPolicy/>
+      {
+        path: "privacy-policy",
+        element: <PrivacyPolicy />
       },
 
       {
-       path:"courses",
-       element:<Courses/>
+        path: "courses",
+        element: <Courses />
       },
-      
+
       {
-        path:"course-detail/:courseId",
-        element:<CourseDetail/>
+        path: "course-detail/:courseId",
+        element: <CourseDetail />
       },
       {
-        path:"course-progress/:courseId",
-        element:(
-        <ProtectedRoute allowedRoles={['student']}>
-          <CourseProgress />
-        </ProtectedRoute>
+        path: "course-progress/:courseId",
+        element: (
+          <ProtectedRoute allowedRoles={['student']}>
+            <CourseProgress />
+          </ProtectedRoute>
         )
       },
-     {
-      path:"login",
-      element:<Login/>
-     },
-     {
-      path:"reset-password/:token",
-      element:<ResetPassword/>
-     },
-    
-     {
-      path:"profile",
-      element:(
-      <ProtectedRoute allowedRoles={['student','instructor']}>
-          <Profile/>
-      </ProtectedRoute>
-      )
-     },
-     
-
-     {
-      path:"student",
-      element:(
-        <ProtectedRoute allowedRoles={['student']}>
-          <Sidebar/>
-        </ProtectedRoute>
-      ),
-      children:[
-        {
-          path:"dashboard",
-          element:<StudDashboard/>
-        },
-        {
-          path:"analytics",
-          element:<Analytics/>
-        },
-        {
-          path:"completed-courses",
-          element:<CompletedCourses/>
-        },
-        {
-          path:"instructors",
-          element:<Instructors/>
-        }
-      ]
-     },
-
-     //instructor routes start from here
-     {
-      path:"instructor",
-      element:(
-        <ProtectedRoute allowedRoles={['instructor']}>
-            <Sidebar/>
-        </ProtectedRoute>
+      {
+        path: "login",
+        element: (
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <Login/>
+          </GoogleOAuthProvider>
         ),
-      children:[
-        {
-          path:"dashboard",
-          element:<Dashboard/>
-        },
-        {
-          path:":courseId/viewCourse",
-          element:<CourseDetails/>
-        },
-        {
-          path:":viewAllCourses" ,
-          element:<AllCourse/>
-        },
-        //analytics route
-        {
-           path:"analytics",
-           element:<MainAnalytics/>
-        },
-        {
-          path:"course",
-          element:<CourseTable/>
-        },
-         {
-          path:"course/create",
-          element:<AddCourse/>
-        },
-        {
-          path:"course/:courseId",
-          element:<EditCourse/>
-        },
-        {
-          path:"course/:courseId/preview",
-          element:<CoursePreview/>
-        },
-        {
-          path:"course/:courseId/preview/analytics",
-          element:<CourseAnalytics/>
-        },
-        {
-          path:"course/:courseId/preview/enrolled",
-          element:<CourseStudentsView/>
-        },
-        {
-          path:"course/:courseId/lecture",
-          element:<CreateLecture/>
-        },
-        {
-          path:"course/:courseId/lecture/:lectureId",
-          element:<EditLecture/>
-        },
-      ]
-     },
+      },
 
-     //admin routes
-     {
-      path:"admin",
-      element:(
-        <ProtectedRoute allowedRoles={['admin']}>
-            <Sidebar/>
-        </ProtectedRoute>
+      {
+        path: "reset-password/:token",
+        element: <ResetPassword />
+      },
+
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute allowedRoles={['student', 'instructor']}>
+            <Profile />
+          </ProtectedRoute>
+        )
+      },
+
+
+      {
+        path: "student",
+        element: (
+          <ProtectedRoute allowedRoles={['student']}>
+            <Sidebar />
+          </ProtectedRoute>
         ),
-      children:[
-        {
-          path:"dashboard",
-          element:<AdminDashboard/>
-        },
-        {
-         path:"topcourses",
-         element:<TopCourses/>
-        },
-        {
-          path:"topinstructor",
-          element:<TopInstructor/>
-        },
-        {
-          path:"manageUser",
-          element:<MangageUser/>
-        },
-        {
-          path:"manageCourses",
-          element:<ManageCourses/>
-        },
-        {
-          path:"messages",
-          element:<Messages/>
-        }
-        
-      ]
-     }
+        children: [
+          {
+            path: "dashboard",
+            element: <StudDashboard />
+          },
+          {
+            path: "analytics",
+            element: <Analytics />
+          },
+          {
+            path: "completed-courses",
+            element: <CompletedCourses />
+          },
+          {
+            path: "instructors",
+            element: <Instructors />
+          }
+        ]
+      },
+
+      //instructor routes start from here
+      {
+        path: "instructor",
+        element: (
+          <ProtectedRoute allowedRoles={['instructor']}>
+            <Sidebar />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: "dashboard",
+            element: <Dashboard />
+          },
+          {
+            path: ":courseId/viewCourse",
+            element: <CourseDetails />
+          },
+          {
+            path: ":viewAllCourses",
+            element: <AllCourse />
+          },
+          //analytics route
+          {
+            path: "analytics",
+            element: <MainAnalytics />
+          },
+          {
+            path: "course",
+            element: <CourseTable />
+          },
+          {
+            path: "course/create",
+            element: <AddCourse />
+          },
+          {
+            path: "course/:courseId",
+            element: <EditCourse />
+          },
+          {
+            path: "course/:courseId/preview",
+            element: <CoursePreview />
+          },
+          {
+            path: "course/:courseId/preview/analytics",
+            element: <CourseAnalytics />
+          },
+          {
+            path: "course/:courseId/preview/enrolled",
+            element: <CourseStudentsView />
+          },
+          {
+            path: "course/:courseId/lecture",
+            element: <CreateLecture />
+          },
+          {
+            path: "course/:courseId/lecture/:lectureId",
+            element: <EditLecture />
+          },
+        ]
+      },
+
+      //admin routes
+      {
+        path: "admin",
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Sidebar />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: "dashboard",
+            element: <AdminDashboard />
+          },
+          {
+            path: "topcourses",
+            element: <TopCourses />
+          },
+          {
+            path: "topinstructor",
+            element: <TopInstructor />
+          },
+          {
+            path: "manageUser",
+            element: <MangageUser />
+          },
+          {
+            path: "manageCourses",
+            element: <ManageCourses />
+          },
+          {
+            path: "messages",
+            element: <Messages />
+          }
+
+        ]
+      }
     ]
   }
 ])
 function App() {
 
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
 
-  useEffect(()=>{
-    const token=localStorage.getItem("token");
-    const user=localStorage.getItem("user");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-    if(token && user){
+    if (token && user) {
       dispatch(userLoggedIn({
         token,
-        user:JSON.parse(user)
+        user: JSON.parse(user)
       }));
     }
-  },[dispatch]);
+  }, [dispatch]);
 
   return (
     <main>
-      <RouterProvider router={appRouter}/>
+      <RouterProvider router={appRouter} />
     </main>
   )
 }

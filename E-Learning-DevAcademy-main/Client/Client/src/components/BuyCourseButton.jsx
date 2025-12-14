@@ -6,74 +6,93 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 
-const BuyCourseButton = ({courseId,amount,onPaymentSuccess}) => {
-   const [createOrder,{}] =useCreateOrderMutation();
-   const [verifyOrder,{}]=useVerifyOrderMutation();
+const BuyCourseButton = ({ courseId, amount, onPaymentSuccess }) => {
+  const [createOrder] = useCreateOrderMutation();
+  const [verifyOrder] = useVerifyOrderMutation();
 
-   const navigate=useNavigate();
-   
-   const token=useSelector((state)=>state.auth.token);
-   
-   
-   const handlePayment=async()=>{
-    
-     if (!token) {
-       alert("Please login to purchase the course.");
-       navigate("/login");
-       return;
-     }
-      
+  const navigate = useNavigate();
+  const { user, token } = useSelector((state) => state.auth);
+
+  const isInstructor = user?.role === "instructor";
+
+  const handlePayment = async () => {
+    if (isInstructor) {
+      toast.error("Please switch to a Student account to purchase courses.");
+      return;
+    }
+
+    if (!token) {
+      toast.error("Please login to purchase the course.");
+      navigate("/login");
+      return;
+    }
+
     try {
-       const order=await createOrder({courseId,amount});
-       const orderData=order.data;
-       
-      const options={
-        key:"rzp_test_yFnMdlPgXudtkV",
-        amount:orderData.amount,
-        currency:orderData.currency,
-        name:"DevAcademy",
-        description:"Course Purchase",
-        order_id:orderData.id,
-        display_amount:orderData.amount,
-         display_currency: "INR",
-        handler:async (response) => {
-           const verifyRes=await verifyOrder({courseId,amount,response});
-           
-           if(verifyRes?.data.success){
-            toast.success("Payment Done.");
+      const order = await createOrder({ courseId, amount }).unwrap();
+
+      const options = {
+        key: "rzp_test_yFnMdlPgXudtkV",
+        amount: order.amount,
+        currency: order.currency,
+        name: "DevAcademy",
+        description: "Course Purchase",
+        order_id: order.id,
+
+        handler: async (response) => {
+          const verifyRes = await verifyOrder({
+            courseId,
+            amount,
+            response,
+          }).unwrap();
+
+          if (verifyRes.success) {
+            toast.success("Payment Successful 🎉");
             onPaymentSuccess?.();
-           }
-           else{
+          } else {
             toast.error("Payment Failed!");
-           }
+          }
         },
-        prefill:{
-          name:"Janhavi Itankar",
-          email:"itankarjanvi@gmail.com"
+
+        prefill: {
+          name: user?.name,
+          email: user?.email,
         },
-        theme:{
-          color:"#2D79F3"
+
+        theme: {
+          color: "#2D79F3",
         },
-       };
-      
-      const rzp = new window.Razorpay(options);  //open the razorpay page for payment
-      rzp.open(); 
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
       console.error("Payment error:", error);
 
-      // check if unauthorized
-      if(error?.error?.status===401){
-        alert("Session Expired.Please login again.");
-        localStorage.removeItem("token");
+      if (error?.status === 401) {
+        toast.error("Session expired. Please login again.");
         navigate("/login");
-        return;
+      } else {
+        toast.error("Something went wrong during payment.");
       }
-      alert("Something went wrong during payment.");
     }
-    }
+  };
+
   return (
-   <Button className={'w-full bg-blue-500 cursor-pointer'} onClick={handlePayment}>Purchase Course</Button>
-  )
-}
+    <Button
+      onClick={handlePayment}
+      disabled={isInstructor}
+      className={`w-full cursor-pointer ${
+        isInstructor
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-500 hover:bg-blue-600"
+      }`}
+    >
+      {isInstructor ? "Instructor cannot purchase courses" : "Purchase Course"}
+    </Button>
+  );
+};
+
+
+
 
 export default BuyCourseButton
