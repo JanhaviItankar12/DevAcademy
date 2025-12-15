@@ -137,7 +137,7 @@ const Profile = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    console.log("User Profile Photo URL:", user);
+  
 
     return (
         <div className='min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800 py-12'>
@@ -265,133 +265,148 @@ const Profile = () => {
                                     </DialogContent>
                                 </Dialog>
 
-                                {/* Notification Preferences Button */}
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button 
-                                            variant="outline" 
-                                            size="lg"
-                                            className='border-purple-300 hover:bg-purple-50 hover:border-purple-400'
-                                        >
-                                            <Bell className='mr-2 h-4 w-4' />
-                                            Notification Settings
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className='sm:max-w-lg'>
-                                        <DialogHeader>
-                                            <DialogTitle className='text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2'>
-                                                <Bell className='h-6 w-6 text-purple-600' />
-                                                Notification Preferences
-                                            </DialogTitle>
-                                            <DialogDescription className='text-gray-600 dark:text-gray-300'>
-                                                Manage your email notification settings
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        
-                                        <div className='py-4 space-y-6'>
-                                            <div className='space-y-4'>
-                                                <div className='flex items-center justify-between'>
-                                                    <div className='flex-1'>
-                                                        <h3 className='font-medium text-gray-900 dark:text-white'>New Courses</h3>
-                                                        <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                                            Get notified about new courses added to the platform
-                                                        </p>
-                                                    </div>
-                                                    <Switch
-                                                        checked={notificationPreferences.newCourse}
-                                                        onCheckedChange={() => handlePreferenceChange('newCourse')}
-                                                        disabled={notificationPreferences.noMails}
-                                                        className='data-[state=checked]:bg-purple-600'
-                                                    />
-                                                </div>
-
-                                                <div className='flex items-center justify-between'>
-                                                    <div className='flex-1'>
-                                                        <h3 className='font-medium text-gray-900 dark:text-white'>Followed Instructors</h3>
-                                                        <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                                            Updates from instructors you follow
-                                                        </p>
-                                                    </div>
-                                                    <Switch
-                                                        checked={notificationPreferences.followedInstructor}
-                                                        onCheckedChange={() => handlePreferenceChange('followedInstructor')}
-                                                        disabled={notificationPreferences.noMails}
-                                                        className='data-[state=checked]:bg-purple-600'
-                                                    />
-                                                </div>
-
-                                                <div className='flex items-center justify-between'>
-                                                    <div className='flex-1'>
-                                                        <h3 className='font-medium text-gray-900 dark:text-white'>Weekly Digest</h3>
-                                                        <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                                            Weekly summary of your learning activities
-                                                        </p>
-                                                    </div>
-                                                    <Switch
-                                                        checked={notificationPreferences.weeklyDigest}
-                                                        onCheckedChange={() => handlePreferenceChange('weeklyDigest')}
-                                                        disabled={notificationPreferences.noMails}
-                                                        className='data-[state=checked]:bg-purple-600'
-                                                    />
-                                                </div>
-
-                                                <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
+                                {/* Notification Preferences Button - Only for Students */}
+                                {user.role === "student" && (
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button 
+                                                variant="outline" 
+                                                size="lg"
+                                                className='border-purple-300 cursor-pointer hover:bg-purple-50 hover:border-purple-400'
+                                            >
+                                                <Bell className='mr-2 h-4 w-4' />
+                                                Notification Settings
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className='sm:max-w-lg'>
+                                            <DialogHeader>
+                                                <DialogTitle className='text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2'>
+                                                    <Bell className='h-6 w-6 text-purple-600' />
+                                                    Notification Preferences
+                                                </DialogTitle>
+                                                <DialogDescription className='text-gray-600 dark:text-gray-300'>
+                                                    Manage your email notification settings
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            
+                                            <div className='py-4 space-y-6'>
+                                                <div className='space-y-4'>
                                                     <div className='flex items-center justify-between'>
                                                         <div className='flex-1'>
-                                                            <h3 className='font-medium text-gray-900 dark:text-white'>Unsubscribe from all</h3>
+                                                            <h3 className='font-medium text-gray-900 dark:text-white'>New Courses</h3>
                                                             <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                                                Stop all email notifications from the platform
+                                                                Get notified about new courses added to the platform
                                                             </p>
                                                         </div>
                                                         <Switch
-                                                            checked={notificationPreferences.noMails}
-                                                            onCheckedChange={() => handlePreferenceChange('noMails')}
-                                                            className='data-[state=checked]:bg-red-600'
+                                                            checked={notificationPreferences.newCourse}
+                                                            onCheckedChange={() => handlePreferenceChange('newCourse')}
+                                                            disabled={notificationPreferences.noMails}
+                                                            className='data-[state=checked]:bg-purple-600'
                                                         />
                                                     </div>
-                                                    {notificationPreferences.noMails && (
-                                                        <p className='text-sm text-red-500 mt-2'>
-                                                            All email notifications are currently disabled
-                                                        </p>
+
+                                                    <div className='flex items-center justify-between'>
+                                                        <div className='flex-1'>
+                                                            <h3 className='font-medium text-gray-900 dark:text-white'>Followed Instructors</h3>
+                                                            <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                                Updates from instructors you follow
+                                                            </p>
+                                                        </div>
+                                                        <Switch
+                                                            checked={notificationPreferences.followedInstructor}
+                                                            onCheckedChange={() => handlePreferenceChange('followedInstructor')}
+                                                            disabled={notificationPreferences.noMails}
+                                                            className='data-[state=checked]:bg-purple-600'
+                                                        />
+                                                    </div>
+
+                                                    <div className='flex items-center justify-between'>
+                                                        <div className='flex-1'>
+                                                            <h3 className='font-medium text-gray-900 dark:text-white'>Weekly Digest</h3>
+                                                            <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                                Weekly summary of your learning activities
+                                                            </p>
+                                                        </div>
+                                                        <Switch
+                                                            checked={notificationPreferences.weeklyDigest}
+                                                            onCheckedChange={() => handlePreferenceChange('weeklyDigest')}
+                                                            disabled={notificationPreferences.noMails}
+                                                            className='data-[state=checked]:bg-purple-600'
+                                                        />
+                                                    </div>
+
+                                                    <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
+                                                        <div className='flex items-center justify-between'>
+                                                            <div className='flex-1'>
+                                                                <h3 className='font-medium text-gray-900 dark:text-white'>Unsubscribe from all</h3>
+                                                                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                                                                    Stop all email notifications from the platform
+                                                                </p>
+                                                            </div>
+                                                            <Switch
+                                                                checked={notificationPreferences.noMails}
+                                                                onCheckedChange={() => handlePreferenceChange('noMails')}
+                                                                className='data-[state=checked]:bg-red-600'
+                                                            />
+                                                        </div>
+                                                        {notificationPreferences.noMails && (
+                                                            <p className='text-sm text-red-500 mt-2'>
+                                                                All email notifications are currently disabled
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className='bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg'>
+                                                    <h4 className='font-medium text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2'>
+                                                        <Bell className='h-4 w-4' />
+                                                        Current Settings
+                                                    </h4>
+                                                    <div className='text-sm text-purple-600 dark:text-purple-400 space-y-1'>
+                                                        <p>• New Courses: {notificationPreferences.newCourse ? 'Enabled' : 'Disabled'}</p>
+                                                        <p>• Followed Instructors: {notificationPreferences.followedInstructor ? 'Enabled' : 'Disabled'}</p>
+                                                        <p>• Weekly Digest: {notificationPreferences.weeklyDigest ? 'Enabled' : 'Disabled'}</p>
+                                                        <p>• Email Status: {notificationPreferences.noMails ? 'All disabled' : 'Active'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <DialogFooter>
+                                                <Button
+                                                    onClick={saveNotificationPreferences}
+                                                    disabled={isUpdatingPreferences}
+                                                    className='w-full cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
+                                                >
+                                                    {isUpdatingPreferences ? (
+                                                        <>
+                                                            <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                                                            Saving...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Save className='mr-2 h-4 w-4' />
+                                                            Save Preferences
+                                                        </>
                                                     )}
-                                                </div>
-                                            </div>
+                                                </Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
+                                )}
 
-                                            <div className='bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg'>
-                                                <h4 className='font-medium text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2'>
-                                                    <Bell className='h-4 w-4' />
-                                                    Current Settings
-                                                </h4>
-                                                <div className='text-sm text-purple-600 dark:text-purple-400 space-y-1'>
-                                                    <p>• New Courses: {notificationPreferences.newCourse ? 'Enabled' : 'Disabled'}</p>
-                                                    <p>• Followed Instructors: {notificationPreferences.followedInstructor ? 'Enabled' : 'Disabled'}</p>
-                                                    <p>• Weekly Digest: {notificationPreferences.weeklyDigest ? 'Enabled' : 'Disabled'}</p>
-                                                    <p>• Email Status: {notificationPreferences.noMails ? 'All disabled' : 'Active'}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <DialogFooter>
-                                            <Button
-                                                onClick={saveNotificationPreferences}
-                                                disabled={isUpdatingPreferences}
-                                                className='w-full cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
-                                            >
-                                                {isUpdatingPreferences ? (
-                                                    <>
-                                                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                                                        Saving...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Save className='mr-2 h-4 w-4' />
-                                                        Save Preferences
-                                                    </>
-                                                )}
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                {/* Instructor-specific buttons (if needed) */}
+                                {user.role === "instructor" && (
+                                    <Button 
+                                        variant="outline" 
+                                        size="lg"
+                                        onClick={() => navigate("/instructor/course/create")}
+                                        className='border-purple-300 cursor-pointer hover:bg-purple-50 hover:border-purple-400'
+                                    >
+                                        <Plus className='mr-2 h-4 w-4' />
+                                        Create Course
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -465,7 +480,7 @@ const Profile = () => {
                                     <p className='text-gray-600 dark:text-gray-300 mb-6'>
                                         Start your learning journey by enrolling in courses
                                     </p>
-                                    <Button onClick={() => navigate(`/course/search?query`)} className='bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'>
+                                    <Button onClick={() => navigate(`/courses`)} className='bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'>
                                         Browse Courses
                                     </Button>
                                 </div>

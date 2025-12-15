@@ -215,7 +215,7 @@ const Analytics = () => {
           <span className="text-xs text-green-600 font-medium">+{trend}%</span>
         )}
       </div>
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
+      <p className="text-lg text-gray-500 mb-1">{label}</p>
       <p className="text-2xl font-bold text-gray-800">{value}</p>
     </div>
   );
@@ -352,8 +352,8 @@ const Analytics = () => {
           {/* Category Distribution */}
           <div className="bg-white p-5 rounded-lg border border-gray-200">
             <div className="mb-4">
-              <h3 className="text-base font-semibold text-gray-800">Category Distribution</h3>
-              <p className="text-xs text-gray-500">Courses completed by category</p>
+              <h3 className="text-lg font-semibold text-gray-800">Category Distribution</h3>
+              <p className="text-sm text-gray-500">Courses completed by category</p>
             </div>
             
             {processedData.categoryData.length > 0 ? (

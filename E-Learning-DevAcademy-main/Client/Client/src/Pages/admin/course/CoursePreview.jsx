@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, BadgeInfo, PlayCircle, Lock, Edit, Settings, Eye, BarChart3, Users } from 'lucide-react';
+import { ArrowLeft, BadgeInfo, PlayCircle, Lock, Edit, Settings, Eye, BarChart3, Users,ChevronLeft,ChevronRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {  useGetCourseDetailWithPurchaseStatusQuery } from '@/features/api/courseApi';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -98,9 +98,9 @@ const CoursePreview = () => {
     };
 
     return (
-        <div className='min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800'>
+        <div className='min-h-screen  bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800'>
             {/* Instructor Header */}
-            <div className='bg-white dark:bg-gray-800 border-b border-purple-100 dark:border-gray-700 shadow-sm fixed top-16 left-0 right-0 z-10'>
+           <div className='bg-white mt-10 dark:bg-gray-800 border-b border-purple-100 dark:border-gray-700 shadow-sm'>
                 <div className='max-w-7xl mx-auto px-4 md:px-8 py-4'>
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
@@ -129,7 +129,7 @@ const CoursePreview = () => {
             </div>
 
             {/* Course Content */}
-            <div className='pt-32 pb-8'>
+            <div className='pt-8 pb-8'>
                 {/* Header Section */}
                 <div className='bg-gradient-to-r from-purple-600 to-blue-600 text-white'>
                     <div className='max-w-7xl mx-auto py-12 px-4 md:px-8'>

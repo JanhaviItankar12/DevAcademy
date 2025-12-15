@@ -6,7 +6,7 @@ import { removeLecture } from "./lecture.controller.js";
 import { Lecture } from "../models/lecture.model.js";
 import { CourseProgress } from '../models/courseProgress.model.js';
 import { User } from '../models/user.model.js';
-import { sendInstructorPublishEmail, sendWeeklyDigestEmail } from '../utils/sendEmail.js';
+import { sendCourseDeletedByAdminEmail, sendInstructorPublishEmail, sendWeeklyDigestEmail } from '../utils/sendEmail.js';
 
 
 export const createCourse = async (req, res) => {
@@ -260,42 +260,62 @@ export const removeCourse = async (req, res) => {
         const { courseId } = req.params;
         const userId = req.id;
         const userRole = req.user.role;
-        const course = await Course.findById(courseId);
+
+        const course = await Course.findById(courseId).populate("creator", "name email");
         if (!course) {
             return res.status(404).json({
                 message: "Course not found!"
-            })
+            });
         }
 
-        if (userRole !== "admin" && course.creator.toString() !== userId.toString()) {
-            return res.status(403).json({ success: false, message: "You are not authorized to delete this course" });
+        // Authorization
+        if (userRole !== "admin" && course.creator._id.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to delete this course"
+            });
         }
 
-        //step 1:delete all referenced lectures
+        // Store instructor info (IMPORTANT)
+        const instructorEmail = course.creator.email;
+        const instructorName = course.creator.name;
+        const courseTitle = course.courseTitle;
+
+        // Step 1: delete all referenced lectures
         const lectures = await Lecture.find({ _id: { $in: course.lectures } });
         for (const lecture of lectures) {
             if (lecture.publicId) {
-                await deleteVideo(lecture.publicId); // delete video from Cloudinary
+                await deleteVideo(lecture.publicId);
             }
-            await Lecture.findByIdAndDelete(lecture._id); // delete lecture from DB
+            await Lecture.findByIdAndDelete(lecture._id);
         }
 
-        //step 2:delete course
+        // Step 2: delete course
         await Course.findByIdAndDelete(courseId);
 
+        // Step 3: Send email ONLY if admin deleted the course
+        if (userRole === "admin") {
+            await sendCourseDeletedByAdminEmail(
+                [instructorEmail],
+                instructorName,
+                courseTitle,
+                "Violation of platform policies or administrative review"
+            );
+        }
+
         return res.status(200).json({
-            message: "Course deleted Successfully",
+            message: "Course deleted successfully",
             success: true
-        })
+        });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({
             message: "Failed to remove course"
-
-        })
+        });
     }
-}
+};
+
 
 export const getPublishedCourses = async (req, res) => {
     try {

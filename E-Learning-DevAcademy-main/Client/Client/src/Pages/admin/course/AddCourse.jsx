@@ -109,7 +109,7 @@ const AddCourse = () => {
   };
 
   return (
-    <div className='flex-1 mx-10 mt-10'>
+    <div className='flex-1 mx-10 mt-12'>
       <div className='mb-4'>
         <h1 className='font-bold text-2xl'>Let's add a course. Add some basic course details for your new course</h1>
         <p className='text-lg'>Easily expand your learning platform by adding a new course. Provide the course title, description, category, and other details to make it available to students. Whether it's a beginner-friendly tutorial or an advanced module, start building your course today and help learners grow their skills!</p>
@@ -156,21 +156,48 @@ const AddCourse = () => {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Category</SelectLabel>
-                  <SelectItem value="Next JS">Next JS</SelectItem>
-                  <SelectItem value="Data Science">Data Science</SelectItem>
+
+                  {/* Web & Frontend */}
+                  <SelectItem value="Web Development">Web Development</SelectItem>
                   <SelectItem value="Frontend Development">Frontend Development</SelectItem>
-                  <SelectItem value="Fullstack Development">Fullstack Development</SelectItem>
-                  <SelectItem value="MERN Stack Development">MERN Stack Development</SelectItem>
-                  <SelectItem value="MongoDB">MongoDB</SelectItem>
+                  <SelectItem value="React JS">React JS</SelectItem>
+                  <SelectItem value="Next JS">Next JS</SelectItem>
                   <SelectItem value="HTML">HTML</SelectItem>
                   <SelectItem value="CSS">CSS</SelectItem>
+                  <SelectItem value="Tailwind CSS">Tailwind CSS</SelectItem>
+                  <SelectItem value="JavaScript">JavaScript</SelectItem>
                   <SelectItem value="TypeScript">TypeScript</SelectItem>
+
+                  {/* Backend & Full Stack */}
+                  <SelectItem value="Backend Development">Backend Development</SelectItem>
+                  <SelectItem value="Full Stack Development">Full Stack Development</SelectItem>
+                  <SelectItem value="MERN Stack">MERN Stack</SelectItem>
+                  <SelectItem value="Node JS">Node JS</SelectItem>
+                  <SelectItem value="Spring Boot">Spring Boot</SelectItem>
+
+                  {/* Databases */}
+                  <SelectItem value="Database Management">Database Management</SelectItem>
+                  <SelectItem value="MongoDB">MongoDB</SelectItem>
+                  <SelectItem value="MySQL">MySQL</SelectItem>
+
+                  {/* Programming Languages */}
                   <SelectItem value="Java">Java</SelectItem>
                   <SelectItem value="Python">Python</SelectItem>
-                  <SelectItem value="C#">C#</SelectItem>
-                  <SelectItem value="Tailwind CSS">Tailwind CSS</SelectItem>
+                  <SelectItem value="C">C</SelectItem>
+                  <SelectItem value="C++">C++</SelectItem>
+
+                  {/* AI & Data */}
+                  <SelectItem value="Data Science">Data Science</SelectItem>
+                  <SelectItem value="Machine Learning">Machine Learning</SelectItem>
+                  <SelectItem value="Artificial Intelligence">Artificial Intelligence</SelectItem>
+
+                  {/* Career */}
+                  <SelectItem value="Data Structures & Algorithms">Data Structures & Algorithms</SelectItem>
+                  <SelectItem value="Interview Preparation">Interview Preparation</SelectItem>
+
                 </SelectGroup>
               </SelectContent>
+
             </Select>
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category}</p>

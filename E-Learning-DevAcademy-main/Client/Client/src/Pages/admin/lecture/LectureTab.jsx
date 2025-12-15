@@ -31,8 +31,7 @@ const LectureTab = () => {
     const { data: lectureData, isLoading: lectureLoading, isSuccess: lectureSuccess, isError: lectureError, refetch } = useGetLectureByIdQuery(lectureId);
     const lecture = lectureData?.lecture;
 
-    console.log(lectureData);
-
+   
     useEffect(() => {
         if (lecture) {
             refetch();
@@ -228,7 +227,7 @@ const LectureTab = () => {
                                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                                 Uploading...
                             </>
-                        ) : "Update Lecture"}
+                        ) : "Save Lecture"}
                     </Button>
                     {!hasChanges && !mediaProgress && (
                         <p className='text-sm text-muted-foreground mt-2'>

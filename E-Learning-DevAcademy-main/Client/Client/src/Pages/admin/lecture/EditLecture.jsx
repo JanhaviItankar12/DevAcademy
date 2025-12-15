@@ -9,12 +9,12 @@ const EditLecture = () => {
     const courseId = params.courseId;
     return (
         <div>
-            <div className='flex items-center justify-between mb-5 mt-5'>
+            <div className='flex items-center justify-between mb-5 mt-12'>
                 <div className='flex items-center gap-2'>
                     <Link to={`/instructor/course/${courseId}/lecture`}>
                         <Button size={'icon'} variant={'outline'} className={'rounded-full cursor-pointer'}><ArrowLeft size={16} /></Button>
                     </Link>
-                    <h1 className='font-bold text-xl'>Update Your Lecture</h1>
+                    <h1 className='font-bold text-xl '>Update Your Lecture</h1>
 
                 </div>
             </div>

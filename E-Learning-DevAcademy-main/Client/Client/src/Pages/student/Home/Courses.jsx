@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, Star, Users, Clock, Search, Filter, ChevronDown, TrendingUp, Award, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useGetPublishedCoursesQuery } from '@/features/api/courseApi';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function Courses() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -17,10 +18,11 @@ export default function Courses() {
 
     const { data, isLoading, isError } = useGetPublishedCoursesQuery();
 
+
+
     const allCourses = data?.courses || [];
 
-    
-    
+
 
     // Handle enrollment
     const handleEnrollment = (courseId) => {
@@ -42,19 +44,19 @@ export default function Courses() {
     ))];
 
     const categories = uniqueCategories.map(cat => ({
-  value: cat,
-  label: cat === 'all' ? 'All Categories' : cat,
-  count: cat === 'all' ? allCourses.length : allCourses.filter(c => c?.category === cat).length
-}));
+        value: cat,
+        label: cat === 'all' ? 'All Categories' : cat,
+        count: cat === 'all' ? allCourses.length : allCourses.filter(c => c?.category === cat).length
+    }));
 
     // Filter and sort courses
     const filteredCourses = allCourses
         .filter(course => course)
         .filter(course => {
             const matchesSearch =
-  (course?.courseTitle?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-  (course?.subTitle?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-  (course?.description?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+                (course?.courseTitle?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                (course?.subTitle?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+                (course?.description?.toLowerCase() || "").includes(searchQuery.toLowerCase());
 
             const matchesCategory = selectedCategory === 'all' || course?.category === selectedCategory;
             const matchesLevel = selectedLevel === 'all' || course?.courseLevel === selectedLevel;
@@ -276,9 +278,9 @@ export default function Courses() {
                                         onChange={(e) => setSortBy(e.target.value)}
                                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
                                     >
-                                        
+
                                         <option value="rating">Highest Rated</option>
-                                       
+
                                         <option value="price-low">Price: Low to High</option>
                                         <option value="price-high">Price: High to Low</option>
                                     </select>
@@ -286,7 +288,11 @@ export default function Courses() {
                             </div>
 
                             {/* Course Cards */}
-                            {currentCourses.length === 0 ? (
+                            {isLoading ? (
+                                <div className="flex justify-center items-center py-20">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : currentCourses.length === 0 ? (
                                 <div className="text-center py-20">
                                     <div className="text-6xl mb-4">📚</div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-2">No courses found</h3>
@@ -359,7 +365,7 @@ export default function Courses() {
                                                             onClick={() => handleEnrollment(course.id)}
                                                             className="px-6 cursor-pointer py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all font-semibold text-sm"
                                                         >
-                                                           {course.isPurchased ? "Continue Course" :"Enroll Now"}
+                                                            {course.isPurchased ? "Continue Course" : "Enroll Now"}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -374,8 +380,8 @@ export default function Courses() {
                                                 onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1}
                                                 className={`p-2 rounded-lg ${currentPage === 1
-                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white text-purple-600 cursor-pointer hover:bg-purple-50 border border-purple-600'
+                                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-white text-purple-600 cursor-pointer hover:bg-purple-50 border border-purple-600'
                                                     }`}
                                             >
                                                 <ChevronLeft className="w-5 h-5" />
@@ -396,8 +402,8 @@ export default function Courses() {
                                                                 key={pageNumber}
                                                                 onClick={() => handlePageChange(pageNumber)}
                                                                 className={`px-4 py-2 rounded-lg font-semibold ${currentPage === pageNumber
-                                                                        ? 'bg-purple-600 text-white cursor-pointer'
-                                                                        : 'bg-white text-gray-700 hover:bg-purple-50 cursor-pointer border border-gray-300'
+                                                                    ? 'bg-purple-600 text-white cursor-pointer'
+                                                                    : 'bg-white text-gray-700 hover:bg-purple-50 cursor-pointer border border-gray-300'
                                                                     }`}
                                                             >
                                                                 {pageNumber}
@@ -417,8 +423,8 @@ export default function Courses() {
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === totalPages}
                                                 className={`p-2 rounded-lg ${currentPage === totalPages
-                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white text-purple-600 cursor-pointer hover:bg-purple-50 border border-purple-600'
+                                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-white text-purple-600 cursor-pointer hover:bg-purple-50 border border-purple-600'
                                                     }`}
                                             >
                                                 <ChevronRight className="w-5 h-5" />

@@ -77,14 +77,32 @@ export const register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const USER = new User({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       role,
-      isApproved: role === "instructor" ? false : true, // auto approve students
+
+      // auto approve students
+      isApproved: role === "instructor" ? false : true,
+
+      // notification preferences
+      notificationPreferences:
+        role === "student"
+          ? {
+            newCourse: true,
+            followedInstructor: true,
+            weeklyDigest: true,
+            noMails: false,
+          }
+          : {
+            newCourse: false,
+            followedInstructor: false,
+            weeklyDigest: false,
+            noMails: false,
+          },
     });
+
 
     await USER.save();
 
@@ -146,7 +164,7 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ success: false, message: "Incorrect email" });
     }
-    
+
     //if user already signed with google
     if (user.provider === "google") {
       return res.status(400).json({
@@ -184,7 +202,7 @@ export const login = async (req, res) => {
       });
     }
 
-    
+
 
 
     // Generate token
@@ -388,7 +406,7 @@ export const googleLogin = async (req, res) => {
         });
       }
 
-      
+
     }
 
     // Generate token
@@ -415,10 +433,10 @@ export const googleLogin = async (req, res) => {
     });
 
   } catch (error) {
-  return res.status(500).json({
-    message: "Google authentication failed"
-  });
-}
+    return res.status(500).json({
+      message: "Google authentication failed"
+    });
+  }
 
 };
 

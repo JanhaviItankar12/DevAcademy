@@ -186,7 +186,7 @@ const StudDashboard = () => {
     <div className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-sm transition-shadow">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-500 mb-2">{label}</p>
+          <p className="text-lg text-gray-500 mb-2">{label}</p>
           <p className="text-2xl font-bold text-gray-800">{value}</p>
         </div>
         <div className={`p-3 rounded-lg ${bgColor}`}>
@@ -294,7 +294,7 @@ const StudDashboard = () => {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center ">
         <div className="text-center">
           <X className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <p className="text-gray-800 text-lg font-semibold mb-2">Failed to load dashboard</p>
@@ -311,7 +311,7 @@ const StudDashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 ">
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
@@ -322,12 +322,7 @@ const StudDashboard = () => {
       <div className="flex-1 overflow-y-auto">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="flex items-center justify-between px-6 py-4">
-            <button 
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-600 hover:text-gray-800"
-            >
-              <Menu size={24} />
-            </button>
+           
             
             <div className="flex-1 max-w-xl mx-4 lg:mx-8">
               <div className="relative">

@@ -30,8 +30,9 @@ export const sendForgotPasswordEmail = async (email, resetLink) => {
 
           <!-- Logo -->
           <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
-            alt="DevAcademy Logo" style="width: 120px; height: auto;" />
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
+                 style="width: 120px; height: auto;" />
           </div>
 
           <!-- Title -->
@@ -96,12 +97,11 @@ export const sendReplyEmail = async (email, name, replyMessage) => {
         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08);">
 
           <!-- Logo -->
-          <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
-                 alt="DevAcademy Logo" 
+         <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
                  style="width: 120px; height: auto;" />
           </div>
-
           <!-- Title -->
           <h2 style="color: #333; text-align: center;">We’ve Replied to Your Message</h2>
 
@@ -165,9 +165,9 @@ export const sendInstructorPublishEmail = async (emails, instructorName, courseT
         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08);">
 
           <!-- Logo -->
-           <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
-                 alt="DevAcademy Logo" 
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
                  style="width: 120px; height: auto;" />
           </div>
 
@@ -250,9 +250,10 @@ export const sendWeeklyDigestEmail = async (users, courses) => {
         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08);">
 
           <!-- Logo -->
-          <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
-                 alt="DevAcademy Logo" style="width: 120px; height: auto;" />
+         <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
+                 style="width: 120px; height: auto;" />
           </div>
 
           <!-- Title -->
@@ -303,9 +304,10 @@ export const sendInstructorApprovalEmail = async (email, name) => {
       <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f6f7fb;">
         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08);">
 
-          <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
-                 alt="DevAcademy Logo" style="width: 120px; height: auto;" />
+         <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
+                 style="width: 120px; height: auto;" />
           </div>
 
           <h2 style="color: #333; text-align: center;">Instructor Approved!</h2>
@@ -355,8 +357,9 @@ export const sendInstructorRejectionEmail = async (email, name, reason = "") => 
         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08);">
 
           <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png" 
-                 alt="DevAcademy Logo" style="width: 120px; height: auto;" />
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
+                 style="width: 120px; height: auto;" />
           </div>
 
           <h2 style="color: #e63946; text-align: center;">Application Not Approved</h2>
@@ -406,6 +409,89 @@ export const sendInstructorRejectionEmail = async (email, name, reason = "") => 
     console.error("Error sending instructor rejection email:", err);
   }
 };
+
+
+
+export const sendCourseDeletedByAdminEmail = async (
+  emails,
+  instructorName,
+  courseTitle,
+  reason = "Policy or administrative reasons"
+) => {
+  try {
+    const sender = {
+      email: "devacademy122025@gmail.com",
+      name: "DevAcademy",
+    };
+
+    const receivers = emails.map((email) => ({ email }));
+
+    await tranEmailApi.sendTransacEmail({
+      sender,
+      to: receivers,
+      subject: `Your course has been removed by Admin`,
+      htmlContent: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f6f7fb;">
+        <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08);">
+
+          <!-- Logo -->
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://res.cloudinary.com/dvy92o8cz/image/upload/v1765536514/vruqbwokxg9x5y0rloux.png"
+                 alt="DevAcademy Logo"
+                 style="width: 120px; height: auto;" />
+          </div>
+
+          <!-- Title -->
+          <h2 style="color: #d9534f; text-align: center;">
+            Course Removed ⚠️
+          </h2>
+
+          <!-- Message -->
+          <p style="font-size: 15px; color: #555;">
+            Hello <strong>${instructorName}</strong>,
+          </p>
+
+          <p style="font-size: 15px; color: #555;">
+            We regret to inform you that your course listed below has been
+            <strong>removed by the DevAcademy Admin</strong>.
+          </p>
+
+          <p style="font-size: 15px; color: #555;">
+            <strong>Course Title:</strong> ${courseTitle}
+          </p>
+
+          <!-- Reason -->
+          <div style="background: #fff4f4; padding: 15px; border-left: 4px solid #d9534f; margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px; color: #b52b27;">
+              <strong>Reason:</strong> ${reason}
+            </p>
+          </div>
+
+          <!-- Note -->
+          <p style="font-size: 14px; color: #666;">
+            If you believe this action was taken in error or you’d like more clarification,
+            please contact our support team.
+          </p>
+
+        
+
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+          <p style="font-size: 12px; text-align: center; color: #999;">
+            © ${new Date().getFullYear()} DevAcademy • All Rights Reserved
+          </p>
+
+        </div>
+      </div>
+      `,
+    });
+
+    console.log("Course deletion email sent to instructor!");
+  } catch (error) {
+    console.error("Error sending course deletion email:", error);
+  }
+};
+
 
 
 

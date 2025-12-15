@@ -62,9 +62,9 @@ const userSchema = mongoose.Schema({
     resetPasswordExpires: Date,
 
     notificationPreferences: {
-        newCourse: { type: Boolean, default: true },     // all new courses
-        followedInstructor: { type: Boolean, default: true },
-        weeklyDigest: { type: Boolean, default: true },
+        newCourse: { type: Boolean, default: false },     // all new courses
+        followedInstructor: { type: Boolean, default: false },
+        weeklyDigest: { type: Boolean, default: false },
         noMails: { type: Boolean, default: false }
     },
 

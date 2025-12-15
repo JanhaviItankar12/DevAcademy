@@ -252,7 +252,7 @@ const CourseTable = () => {
             </p>
             <Button 
               onClick={() => navigate('create')}
-              className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
+              className='bg-gradient-to-r from-purple-600 cursor-pointer to-blue-600 hover:from-purple-700 hover:to-blue-700'
             >
               <Plus className='mr-2 h-4 w-4' />
               Create Your First Course

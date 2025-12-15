@@ -5,40 +5,40 @@ import React from 'react'
 
 const TopInstructor = () => {
   const { data, isLoading, isError, refetch } = useTopInstructorsQuery();
-  console.log(data);
-  
+
+
   if (isLoading) {
-    return <LoadingSpinner/>
+    return <LoadingSpinner />
   }
-  
+
   if (isError) return <p className="text-red-500 text-lg p-6">Failed to load instructor data</p>;
 
   // Format revenue to currency
- // Format revenue to Indian Rupees
-const formatRevenue = (amount) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-};
+  // Format revenue to Indian Rupees
+  const formatRevenue = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mt-7">
-      <div className="p-6 bg-gradient-to-r from-purple-50 to-white border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Top Instructors</h2>
-            <p className="text-gray-600 text-lg mt-1">Leading educators by performance</p>
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 lg:p-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
           </div>
-          <div className="p-3 bg-purple-100 rounded-xl">
-            <TrendingUp className="w-6 h-6 text-purple-600" />
+          <div>
+            <h2 className="text-2xl lg:text-2xl font-bold text-gray-900">Top Instructors</h2>
+            <p className="text-lg lg:text-lg text-gray-600 mt-0.5">Best performing Instructors this month</p>
           </div>
         </div>
       </div>
-      
+
       <div className="overflow-hidden">
         <div className="min-w-full divide-y divide-gray-100">
           {data?.topInstructors.map((instructor, index) => (
@@ -62,13 +62,12 @@ const formatRevenue = (amount) => {
                         </div>
                       )}
                       {index < 3 && (
-                        <div className={`absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                          index === 0 
-                            ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' 
+                        <div className={`absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${index === 0
+                            ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
                             : index === 1
-                            ? 'bg-gray-100 text-gray-700 border border-gray-200'
-                            : 'bg-orange-100 text-orange-700 border border-orange-200'
-                        }`}>
+                              ? 'bg-gray-100 text-gray-700 border border-gray-200'
+                              : 'bg-orange-100 text-orange-700 border border-orange-200'
+                          }`}>
                           #{index + 1}
                         </div>
                       )}
@@ -85,19 +84,19 @@ const formatRevenue = (amount) => {
                             <Star className="w-4 h-4 text-yellow-500 fill-current" />
                           )}
                         </h3>
-                        
+
                         <div className="flex items-center gap-3 mt-2">
                           <div className="flex items-center gap-1 text-sm text-gray-600">
                             <BookOpen className="w-4 h-4" />
                             <span>{instructor.totalCourses} course{instructor.totalCourses !== 1 ? 's' : ''}</span>
                           </div>
-                          
+
                           <div className="flex items-center gap-1 text-sm text-gray-600">
                             <Users className="w-4 h-4" />
                             <span>{instructor.totalEnrolledStudents} student{instructor.totalEnrolledStudents !== 1 ? 's' : ''}</span>
                           </div>
                         </div>
-                        
+
                         {instructor.email && (
                           <div className="flex items-center gap-1 mt-2 text-sm text-gray-500">
                             <Mail className="w-4 h-4" />

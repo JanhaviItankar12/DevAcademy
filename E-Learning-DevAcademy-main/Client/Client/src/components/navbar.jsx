@@ -106,7 +106,7 @@ const Navbar = () => {
 
                         {user ? (
                             <>
-                                <DarkMode />
+                                
                                 {/* Logged in user dropdown */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>

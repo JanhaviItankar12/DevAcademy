@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Mail, User, Calendar, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, X, Mail, User, Calendar, Search, ChevronLeft, ChevronRight,Loader2 } from 'lucide-react';
 import { useApproveUserMutation, useManageUserQuery, useRejectUserMutation } from '@/features/api/courseApi';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-export default function MangageUser() {
-  
-
-
+export default function ManageUser() {
   const [allUsers, setAllUsers] = useState([]);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('pending'); // pending, approved, rejected, students
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
+  const [loadingAction, setLoadingAction] = useState(null); // Track which action is loading
   const itemsPerPage = 5;
 
-  const {data,isLoading,isError}=useManageUserQuery();
-  const [approveUser,{data:approveData,isLoading:approveLoading,isError:approveError}]=useApproveUserMutation();
-  const [rejectUser,{data:rejectData,isLoading:rejectLoading,isError:rejectError}]=useRejectUserMutation();
+  const { data, isLoading, isError } = useManageUserQuery();
+  const [approveUser, { isLoading: approveLoading }] = useApproveUserMutation();
+  const [rejectUser, { isLoading: rejectLoading }] = useRejectUserMutation();
 
   // Update allUsers when data changes
   useEffect(() => {
@@ -90,27 +87,43 @@ export default function MangageUser() {
   }, [activeTab, searchTerm]);
 
   const handleApprove = async (instructorId) => {
-    await approveUser(instructorId);
-    
-    setAllUsers(prev => prev.map(user => 
-      user._id === instructorId 
-        ? { ...user, approved: true, approvedAt: new Date().toISOString() }
-        : user
-    ));
-    setSelectedInstructor(null);
-    alert('Instructor approved successfully!');
+    setLoadingAction(`approve-${instructorId}`);
+    try {
+      await approveUser(instructorId);
+      
+      setAllUsers(prev => prev.map(user => 
+        user._id === instructorId 
+          ? { ...user, approved: true, approvedAt: new Date().toISOString() }
+          : user
+      ));
+      setSelectedInstructor(null);
+      alert('Instructor approved successfully!');
+    } catch (error) {
+      console.error('Approval failed:', error);
+      alert('Failed to approve instructor. Please try again.');
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   const handleReject = async (instructorId) => {
-    await rejectUser(instructorId);
-    
-    setAllUsers(prev => prev.map(user => 
-      user._id === instructorId 
-        ? { ...user, rejected: true, rejectedAt: new Date().toISOString() }
-        : user
-    ));
-    setSelectedInstructor(null);
-    alert('Instructor registration rejected.');
+    setLoadingAction(`reject-${instructorId}`);
+    try {
+      await rejectUser(instructorId);
+      
+      setAllUsers(prev => prev.map(user => 
+        user._id === instructorId 
+          ? { ...user, rejected: true, rejectedAt: new Date().toISOString() }
+          : user
+      ));
+      setSelectedInstructor(null);
+      alert('Instructor registration rejected.');
+    } catch (error) {
+      console.error('Rejection failed:', error);
+      alert('Failed to reject instructor. Please try again.');
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -140,7 +153,7 @@ export default function MangageUser() {
   // Loading state
   if (isLoading) {
     return (
-     <LoadingSpinner/>
+      <LoadingSpinner/>
     );
   }
 
@@ -158,7 +171,7 @@ export default function MangageUser() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6 mt-5">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -327,7 +340,7 @@ export default function MangageUser() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {currentUsers.map((user) => (
                       <tr 
-                        key={user.id}
+                        key={user._id}
                         className="hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -375,17 +388,37 @@ export default function MangageUser() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleApprove(user._id)}
-                                className="bg-green-500 cursor-pointer hover:bg-green-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
+                                disabled={loadingAction === `approve-${user._id}` || loadingAction === `reject-${user._id}`}
+                                className="bg-green-500 cursor-pointer hover:bg-green-600 text-white px-3 py-2 rounded-lg flex items-center gap-1 transition-colors disabled:opacity-70 disabled:cursor-not-allowed min-w-[100px] justify-center"
                               >
-                                <Check className="w-4 h-4" />
-                                Approve
+                                {loadingAction === `approve-${user._id}` ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Approving...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="w-4 h-4" />
+                                    Approve
+                                  </>
+                                )}
                               </button>
                               <button
                                 onClick={() => handleReject(user._id)}
-                                className="bg-red-500 cursor-pointer hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
+                                disabled={loadingAction === `reject-${user._id}` || loadingAction === `approve-${user._id}`}
+                                className="bg-red-500 cursor-pointer hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center gap-1 transition-colors disabled:opacity-70 disabled:cursor-not-allowed min-w-[100px] justify-center"
                               >
-                                <X className="w-4 h-4" />
-                                Reject
+                                {loadingAction === `reject-${user._id}` ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Rejecting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-4 h-4" />
+                                    Reject
+                                  </>
+                                )}
                               </button>
                             </div>
                           </td>

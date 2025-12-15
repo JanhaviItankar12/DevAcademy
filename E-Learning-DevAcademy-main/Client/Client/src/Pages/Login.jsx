@@ -278,7 +278,7 @@ export default function Login() {
             <div className="space-y-4">
               <button
                 onClick={() => setActiveFlow("login")}
-                className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-2"
+                className="flex items-center cursor-pointer gap-2 text-gray-600 hover:text-purple-600 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="text-sm font-medium">Back to Login</span>
@@ -317,7 +317,7 @@ export default function Login() {
               <button
                 onClick={handleForgotPassword}
                 disabled={forgotPasswordLoading}
-                className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                className="w-full py-2.5 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
               >
                 {forgotPasswordLoading ? (
                   <span className="flex items-center justify-center">

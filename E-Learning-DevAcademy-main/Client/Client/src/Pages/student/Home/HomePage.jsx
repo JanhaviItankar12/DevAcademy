@@ -24,7 +24,7 @@ export default function HomePage() {
   const courses = data?.courses || [];
   const reviews = dataOfReviews?.reviews || [];
 
-  console.log(courses);
+ 
 
   const navigate = useNavigate();
 
