@@ -29,7 +29,7 @@ const port=process.env.port || 5000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: "https://gentle-babka-22b07f.netlify.app",
+    origin: "https://devacademy-bc2rrs59g-janhaviitankar12s-projects.vercel.app/",
     credentials:true
 }));
 
