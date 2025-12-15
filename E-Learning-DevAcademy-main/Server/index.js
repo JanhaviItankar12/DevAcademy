@@ -18,6 +18,8 @@ dotenv.config();
 const app=express();
 const __dirname = path.resolve();
 
+app.set("trust proxy", 1);
+
 //call database
 connectDB();
 
