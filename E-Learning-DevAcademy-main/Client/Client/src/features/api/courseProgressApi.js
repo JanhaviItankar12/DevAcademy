@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const COURSE_PROGRESS_API="https://devacademy-ssuf.onrender.com/api/v1/progress"
+const COURSE_PROGRESS_API=`${BACKEND_URL}/api/v1/progress`
 export const courseProgressApi = createApi({
     reducerPath: "courseProgressApi",
     tagTypes:["CourseProgress"],

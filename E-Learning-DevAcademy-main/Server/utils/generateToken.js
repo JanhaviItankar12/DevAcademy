@@ -1,12 +1,23 @@
 import jwt from "jsonwebtoken";
 
 export const generateToken = (res, user, message) => {
-    const token = jwt.sign({ userId: user._id }, process.env.secret_key, { expiresIn: "1d" });
-    return res.status(200).cookie("token", token, { httpOnly: true, sameSite: "strict", maxAge: 24 * 60 * 60 * 1000 })
+  const token = jwt.sign(
+    { userId: user._id },
+    process.env.secret_key,
+    { expiresIn: "1d" }
+  );
+
+  return res
+    .status(200)
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: true,        
+      sameSite: "none",    // REQUIRED (Netlify ↔ Render)
+      maxAge: 24 * 60 * 60 * 1000
+    })
     .json({
-       success:true,
-       message,
-       user ,
-       token
+      success: true,
+      message,
+      user
     });
-}
+};
