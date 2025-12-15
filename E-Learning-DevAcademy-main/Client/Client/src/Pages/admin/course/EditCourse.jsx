@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import CourseTab from './courseTab'
+import CourseTab from './CourseTab';
+
 
 const EditCourse = () => {
   const navigate=useNavigate();
