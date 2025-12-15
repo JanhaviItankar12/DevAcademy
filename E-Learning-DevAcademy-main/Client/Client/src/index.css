@@ -1,5 +1,10 @@
-@import "tailwindcss";
+/* Tailwind v4 setup */
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 @import "tw-animate-css";
+
+
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -116,5 +121,18 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0;
   }
 }
