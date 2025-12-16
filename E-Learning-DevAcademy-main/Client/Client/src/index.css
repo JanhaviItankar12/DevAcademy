@@ -1,12 +1,11 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
 }
 
-
-
-@import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
