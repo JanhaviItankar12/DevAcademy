@@ -1,10 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-}
+
 
 
 @custom-variant dark (&:is(.dark *));
@@ -118,7 +115,9 @@ html {
 
 @layer base {
   html {
-    font-size: 15px;
+    font-size: 16px; 
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
