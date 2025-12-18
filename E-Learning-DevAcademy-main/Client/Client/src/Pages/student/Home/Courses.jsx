@@ -3,6 +3,7 @@ import { BookOpen, Star, Users, Clock, Search, Filter, ChevronDown, TrendingUp, 
 import { useSelector } from 'react-redux';
 import { useGetPublishedCoursesQuery } from '@/features/api/courseApi';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useNavigate } from 'react-router-dom';
 
 export default function Courses() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -18,7 +19,7 @@ export default function Courses() {
 
     const { data, isLoading, isError } = useGetPublishedCoursesQuery();
 
-
+    const navigate=useNavigate();
 
     const allCourses = data?.courses || [];
 
