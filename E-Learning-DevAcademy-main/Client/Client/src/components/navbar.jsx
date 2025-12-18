@@ -49,7 +49,7 @@ const Navbar = () => {
                     <div className="flex items-center space-x-2">
                         <CodeSquareIcon className='w-8 h-8  text-purple-600' />
                         <Link to="/">
-                            <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                            <span className="text-xl font-bold text-purple-600 dark:text-purple-400">
                                 DevAcademy
                             </span>
                         </Link>
