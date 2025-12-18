@@ -47,19 +47,18 @@ const Navbar = () => {
     };
 
     return (
-        <>
-            <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white dark:bg-[#0A0A0A] shadow-lg' : 'bg-white dark:bg-[#0A0A0A]'} border-b dark:border-gray-800 border-gray-200`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-                    <div className="flex justify-between items-center">
-                        {/* Logo */}
-                        <div className="flex items-center space-x-2">
-                            <CodeSquareIcon className='w-6 h-6 sm:w-7 sm:h-7 text-purple-600' />
-                            <Link to="/" className="flex items-center">
-                                <span className="text-lg sm:text-xl font-bold text-purple-600 dark:text-purple-400">
-                                    DevAcademy
-                                </span>
-                            </Link>
-                        </div>
+        <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white dark:bg-[#0A0A0A] shadow-lg' : 'bg-white dark:bg-[#0A0A0A]'} border-b dark:border-gray-800 border-gray-200`}>
+            <div className="max-w-7xl mx-auto px-6 py-4">
+                <div className="flex justify-between items-center">
+                    {/* Logo */}
+                    <div className="flex items-center space-x-2">
+                        <CodeSquareIcon className='w-8 h-8  text-purple-600' />
+                        <Link to="/">
+                            <span className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                                DevAcademy
+                            </span>
+                        </Link>
+                    </div>
 
                         {/* Navigation Links - Desktop */}
                         {!user && isHome && (
