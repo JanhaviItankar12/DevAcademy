@@ -271,14 +271,14 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br mt-9 from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
           
           {/* Forgot Password Flow */}
           {activeFlow === "forgotPassword" && (
             <div className="space-y-4">
               <button
                 onClick={() => setActiveFlow("login")}
-                className="flex items-center cursor-pointer gap-2 text-gray-600 hover:text-purple-600 mb-2"
+                className="flex items-center cursor-pointer gap-2 text-gray-600 hover:text-purple-600 mb-2 text-base"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="text-sm font-medium">Back to Login</span>
@@ -304,7 +304,7 @@ export default function Login() {
                       setErrors(prev => ({ ...prev, email: '' }));
                     }}
                     placeholder="your@email.com"
-                    className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                    className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-base ${
                       errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                     }`}
                   />
@@ -317,7 +317,7 @@ export default function Login() {
               <button
                 onClick={handleForgotPassword}
                 disabled={forgotPasswordLoading}
-                className="w-full py-2.5 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                className="w-full py-2.5 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-base"
               >
                 {forgotPasswordLoading ? (
                   <span className="flex items-center justify-center">
@@ -334,7 +334,7 @@ export default function Login() {
           {/* Google Login Modal */}
           {showGoogleModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-xl p-6 max-w-sm w-full">
+              <div className="bg-white rounded-xl p-6 max-w-sm w-full max-h-[80vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold text-gray-900">Continue with Google</h3>
                   <button
@@ -345,14 +345,14 @@ export default function Login() {
                   </button>
                 </div>
                 
-                <p className="text-gray-600 text-lg mb-6">
+                <p className="text-gray-600 text-base mb-6">
                   Please select your role first, then sign in with Google:
                 </p>
                 
                 {/* Role Selection */}
                 <div className="space-y-4 mb-6">
                   <div 
-                    className={`border rounded-lg p-4 cursor-pointer transition-all ${googleRole === "student" ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[80px] ${googleRole === "student" ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}
                     onClick={() => setGoogleRole("student")}
                   >
                     <div className="flex items-center">
@@ -360,14 +360,14 @@ export default function Login() {
                         {googleRole === "student" && <div className="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>}
                       </div>
                       <div>
-                        <span className="font-medium block">Student</span>
-                        <p className="text-xs text-gray-500 mt-1">Access courses and learn</p>
+                        <span className="font-medium text-base block">Student</span>
+                        <p className="text-sm text-gray-500 mt-1">Access courses and learn</p>
                       </div>
                     </div>
                   </div>
                   
                   <div 
-                    className={`border rounded-lg p-4 cursor-pointer transition-all ${googleRole === "instructor" ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all min-h-[80px] ${googleRole === "instructor" ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}
                     onClick={() => setGoogleRole("instructor")}
                   >
                     <div className="flex items-center">
@@ -375,8 +375,8 @@ export default function Login() {
                         {googleRole === "instructor" && <div className="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>}
                       </div>
                       <div>
-                        <span className="font-medium block">Instructor</span>
-                        <p className="text-xs text-gray-500 mt-1">Create and manage courses</p>
+                        <span className="font-medium text-base block">Instructor</span>
+                        <p className="text-sm text-gray-500 mt-1">Create and manage courses</p>
                         {googleRole === "instructor" && (
                           <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
                             <AlertCircle className="inline w-3 h-3 mr-1" />
@@ -405,7 +405,7 @@ export default function Login() {
                 <div className="mt-4 text-center">
                   <button
                     onClick={() => setShowGoogleModal(false)}
-                    className="text-sm cursor-pointer text-gray-600 hover:text-gray-800"
+                    className="text-sm cursor-pointer text-gray-600 hover:text-gray-800 text-base"
                   >
                     Cancel
                   </button>
@@ -425,7 +425,7 @@ export default function Login() {
                     setActiveFlow('login');
                     setErrors({});
                   }}
-                  className={`flex-1 py-2 rounded-md font-semibold text-lg transition-all cursor-pointer ${
+                  className={`flex-1 py-2 rounded-md font-semibold text-base transition-all cursor-pointer ${
                     tab === 'login' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-600 hover:text-purple-600'
                   }`}
                 >
@@ -438,7 +438,7 @@ export default function Login() {
                     setErrors({});
                     setPasswordStrength({ score: 0, feedback: [] });
                   }}
-                  className={`flex-1 py-2 rounded-md font-semibold text-lg cursor-pointer transition-all ${
+                  className={`flex-1 py-2 rounded-md font-semibold text-base cursor-pointer transition-all ${
                     tab === 'signup' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-600 hover:text-purple-600'
                   }`}
                 >
@@ -450,7 +450,7 @@ export default function Login() {
               <div className="mb-4">
                 <button
                   onClick={handleCustomGoogleClick}
-                  className="w-full py-2.5 px-4 border cursor-pointer border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 mb-3"
+                  className="w-full py-2.5 px-4 border cursor-pointer border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 mb-3 text-base"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -458,12 +458,12 @@ export default function Login() {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  <span className="text-lg font-medium">Continue with Google</span>
+                  <span className="font-medium">Continue with Google</span>
                 </button>
 
                 <div className="flex items-center my-3">
                   <div className="flex-grow border-t border-gray-300"></div>
-                  <span className="mx-3 text-gray-500 text-xs">OR</span>
+                  <span className="mx-3 text-gray-500 text-sm">OR</span>
                   <div className="flex-grow border-t border-gray-300"></div>
                 </div>
               </div>
@@ -473,7 +473,7 @@ export default function Login() {
                 <div className="space-y-3.5">
                   <div className="mb-3">
                     <h2 className="text-xl font-bold text-gray-900">Welcome Back!</h2>
-                    <p className="text-gray-600 text-sm">Continue your learning journey</p>
+                    <p className="text-gray-600 text-base">Continue your learning journey</p>
                   </div>
 
                   <div>
@@ -486,7 +486,7 @@ export default function Login() {
                         value={loginInput.email}
                         onChange={(e) => changeInputHandler(e, 'login')}
                         placeholder="your@email.com"
-                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-base ${
                           errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
@@ -504,7 +504,7 @@ export default function Login() {
                         value={loginInput.password}
                         onChange={(e) => changeInputHandler(e, 'login')}
                         placeholder="Enter password"
-                        className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-base ${
                           errors.password ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
@@ -522,7 +522,7 @@ export default function Login() {
                   <div className="flex justify-end">
                     <button
                       onClick={() => setActiveFlow("forgotPassword")}
-                      className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer font-medium"
+                      className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer font-medium text-base"
                     >
                       Forgot Password?
                     </button>
@@ -536,7 +536,7 @@ export default function Login() {
                         name="role"
                         value={loginInput.role}
                         onChange={(e) => changeInputHandler(e, 'login')}
-                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none"
+                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none text-base"
                       >
                         <option value="student">Student</option>
                         <option value="instructor">Instructor</option>
@@ -548,7 +548,7 @@ export default function Login() {
                   <button
                     onClick={() => handleRegistration('login')}
                     disabled={loginIsLoading}
-                    className="w-full py-2.5 cursor-pointer text-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    className="w-full py-2.5 cursor-pointer text-base bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {loginIsLoading ? (
                       <span className="flex items-center justify-center">
@@ -560,7 +560,7 @@ export default function Login() {
                     )}
                   </button>
 
-                  <p className="text-center text-gray-600 text-sm">
+                  <p className="text-center text-gray-600 text-base">
                     Don't have an account?{' '}
                     <button
                       onClick={() => {
@@ -568,7 +568,7 @@ export default function Login() {
                         setActiveFlow('signup');
                         setErrors({});
                       }}
-                      className="text-purple-600 cursor-pointer text-sm font-semibold hover:text-purple-700"
+                      className="text-purple-600 cursor-pointer text-base font-semibold hover:text-purple-700"
                     >
                       Sign up
                     </button>
@@ -581,7 +581,7 @@ export default function Login() {
                 <div className="space-y-3.5">
                   <div className="mb-3">
                     <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
-                    <p className="text-gray-600 text-sm">Start your learning journey</p>
+                    <p className="text-gray-600 text-base">Start your learning journey</p>
                   </div>
 
                   <div>
@@ -594,7 +594,7 @@ export default function Login() {
                         value={signupInput.name}
                         onChange={(e) => changeInputHandler(e, 'signup')}
                         placeholder="John Doe"
-                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-base ${
                           errors.name ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
@@ -612,7 +612,7 @@ export default function Login() {
                         value={signupInput.email}
                         onChange={(e) => changeInputHandler(e, 'signup')}
                         placeholder="your@email.com"
-                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-base ${
                           errors.email ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
@@ -630,7 +630,7 @@ export default function Login() {
                         value={signupInput.password}
                         onChange={(e) => changeInputHandler(e, 'signup')}
                         placeholder="Create strong password"
-                        className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-base ${
                           errors.password ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-purple-200'
                         }`}
                       />
@@ -678,7 +678,7 @@ export default function Login() {
                         name="role"
                         value={signupInput.role}
                         onChange={(e) => changeInputHandler(e, 'signup')}
-                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none"
+                        className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 appearance-none text-base"
                       >
                         <option value="student">Student</option>
                         <option value="instructor">Instructor</option>
@@ -687,12 +687,12 @@ export default function Login() {
                   </div>
 
                   {signupInput.role === 'instructor' && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-base">
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-xs font-semibold text-blue-900 mb-1">Instructor Approval Required</p>
-                          <p className="text-sm text-blue-700 leading-relaxed">
+                          <p className="text-sm font-semibold text-blue-900 mb-1">Instructor Approval Required</p>
+                          <p className="text-base text-blue-700 leading-relaxed">
                             Admin will review your account within 3-5 business days. You'll receive an email once approved to start creating courses.
                           </p>
                         </div>
@@ -703,7 +703,7 @@ export default function Login() {
                   <button
                     onClick={() => handleRegistration('signup')}
                     disabled={registeredLoading}
-                    className="w-full py-2.5 bg-gradient-to-r text-lg cursor-pointer from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    className="w-full py-2.5 bg-gradient-to-r text-base cursor-pointer from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {registeredLoading ? (
                       <span className="flex items-center justify-center">
@@ -715,7 +715,7 @@ export default function Login() {
                     )}
                   </button>
 
-                  <p className="text-center text-gray-600 text-sm">
+                  <p className="text-center text-gray-600 text-base">
                     Already have an account?{' '}
                     <button
                       onClick={() => {
@@ -724,7 +724,7 @@ export default function Login() {
                         setErrors({});
                         setPasswordStrength({ score: 0, feedback: [] });
                       }}
-                      className="text-purple-600  cursor-pointer text-sm font-semibold hover:text-purple-700"
+                      className="text-purple-600 cursor-pointer text-base font-semibold hover:text-purple-700"
                     >
                       Login
                     </button>
