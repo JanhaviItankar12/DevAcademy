@@ -12,7 +12,7 @@ const CourseAnalytics = () => {
     const [selectedPeriod, setSelectedPeriod] = useState(currentYear);
     const [engagementView, setEngagementView] = useState('cards');
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    
+
     // Store chart instances in refs
     const revenueChartInstance = useRef(null);
     const ratingChartInstance = useRef(null);
@@ -36,7 +36,7 @@ const CourseAnalytics = () => {
         };
 
         window.addEventListener('resize', handleResize);
-        
+
         // Call resize handler once to set initial width
         handleResize();
 
@@ -99,7 +99,7 @@ const CourseAnalytics = () => {
             watchtimeChartInstance,
             viewsChartInstance
         ];
-        
+
         charts.forEach(chartRef => {
             if (chartRef.current) {
                 chartRef.current.destroy();
@@ -119,23 +119,23 @@ const CourseAnalytics = () => {
     // Initialize Revenue Chart
     const initRevenueChart = () => {
         if (!revenueChartRef.current || !analyticsData?.monthlyData) return;
-        
+
         const ctx = revenueChartRef.current.getContext('2d');
-        
+
         // Create gradient for revenue bars
         const revenueGradient = ctx.createLinearGradient(0, 0, 0, 400);
         revenueGradient.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
         revenueGradient.addColorStop(1, 'rgba(59, 130, 246, 0.3)');
-        
+
         // Create gradient for enrollment line
         const enrollmentGradient = ctx.createLinearGradient(0, 0, 0, 400);
         enrollmentGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
         enrollmentGradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
-        
+
         const isMobile = windowWidth < 768;
         const fontSize = isMobile ? 10 : 12;
         const legendFontSize = isMobile ? 11 : 13;
-        
+
         revenueChartInstance.current = new Chart(revenueChartRef.current, {
             type: 'bar',
             data: {
@@ -204,7 +204,7 @@ const CourseAnalytics = () => {
                         padding: 12,
                         displayColors: true,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 let label = context.dataset.label || '';
                                 if (label) {
                                     label += ': ';
@@ -233,7 +233,7 @@ const CourseAnalytics = () => {
                             font: {
                                 size: fontSize
                             },
-                            callback: function(value) {
+                            callback: function (value) {
                                 return '₹' + (value / 1000).toFixed(0) + 'K';
                             }
                         },
@@ -290,9 +290,9 @@ const CourseAnalytics = () => {
     // Initialize Rating Chart
     const initRatingChart = () => {
         if (!ratingChartRef.current || !analyticsData?.reviw) return;
-        
+
         const isMobile = windowWidth < 768;
-        
+
         ratingChartInstance.current = new Chart(ratingChartRef.current, {
             type: 'doughnut',
             data: {
@@ -345,7 +345,7 @@ const CourseAnalytics = () => {
     // Initialize Engagement Charts
     const initEngagementCharts = () => {
         if (!analyticsData?.lectureEngagement) return;
-        
+
         const isMobile = windowWidth < 768;
         const fontSize = isMobile ? 10 : 12;
         const legendFontSize = isMobile ? 11 : 13;
@@ -355,7 +355,7 @@ const CourseAnalytics = () => {
             dropoffChartInstance.current = new Chart(dropoffChartRef.current, {
                 type: 'line',
                 data: {
-                    labels: analyticsData.lectureEngagement.map(item => 
+                    labels: analyticsData.lectureEngagement.map(item =>
                         isMobile ? item.title.substring(0, 20) + '...' : item.title
                     ),
                     datasets: [{
@@ -435,7 +435,7 @@ const CourseAnalytics = () => {
             watchtimeChartInstance.current = new Chart(watchtimeChartRef.current, {
                 type: 'bar',
                 data: {
-                    labels: analyticsData.lectureEngagement.map(item => 
+                    labels: analyticsData.lectureEngagement.map(item =>
                         isMobile ? item.title.substring(0, 20) + '...' : item.title
                     ),
                     datasets: [{
@@ -507,7 +507,7 @@ const CourseAnalytics = () => {
             viewsChartInstance.current = new Chart(viewsChartRef.current, {
                 type: 'bar',
                 data: {
-                    labels: analyticsData.lectureEngagement.map(item => 
+                    labels: analyticsData.lectureEngagement.map(item =>
                         isMobile ? item.title.substring(0, 20) + '...' : item.title
                     ),
                     datasets: [{
@@ -621,7 +621,7 @@ const CourseAnalytics = () => {
         };
 
         return (
-            <div className='bg-white p-3 sm:p-4 md:p-6 rounded-xl border shadow-sm'>
+            <div className='bg-white p-3 sm:p-4 md:p-6 rounded-xl  shadow-sm'>
                 <div className='flex items-center justify-between'>
                     <div className='flex-1 min-w-0'>
                         <p className='text-lg sm:text-sm text-gray-600 dark:text-gray-400 mb-1 truncate'>{title}</p>
@@ -671,11 +671,11 @@ const CourseAnalytics = () => {
     return (
         <div className='min-h-screen bg-gray-50 dark:bg-gray-900 pt-10'>
             {/* Header */}
-            <div className='bg-white dark:bg-gray-800 border-b shadow-sm'>
+            <div className='bg-white dark:bg-gray-800  shadow-sm'>
                 <div className='max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-4'>
                     <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
                         <div className='flex items-center gap-3 sm:gap-4'>
-                            <button 
+                            <button
                                 className='p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0'
                                 onClick={() => navigate(-1)}
                             >
@@ -694,7 +694,7 @@ const CourseAnalytics = () => {
                             <select
                                 value={selectedPeriod}
                                 onChange={(e) => setSelectedPeriod(parseInt(e.target.value))}
-                                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm w-full sm:w-auto"
+                                className="px-3 py-2 bg-white dark:bg-gray-700  rounded-lg text-xs sm:text-sm w-full sm:w-auto"
                             >
                                 <option value={2023}>2023</option>
                                 <option value={2024}>2024</option>
@@ -713,7 +713,7 @@ const CourseAnalytics = () => {
                         value={`₹${analyticsData?.overview?.totalRevenue || 0}`}
                         icon={IndianRupee}
                         color="green"
-                        
+
                     />
                     <StatCard
                         title="Total Students"
@@ -736,7 +736,7 @@ const CourseAnalytics = () => {
                 </div>
 
                 {/* Revenue & Enrollment Chart */}
-                <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl border shadow-sm mb-4 sm:mb-6 md:mb-8'>
+                <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl  shadow-sm mb-4 sm:mb-6 md:mb-8'>
                     <h3 className='text-lg sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-6'>
                         Revenue & Enrollments
                     </h3>
@@ -747,7 +747,7 @@ const CourseAnalytics = () => {
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8'>
                     {/* Rating Distribution */}
-                    <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl border shadow-sm'>
+                    <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl  shadow-sm'>
                         <h3 className='text-lg sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-6'>
                             Rating Distribution
                         </h3>
@@ -757,7 +757,7 @@ const CourseAnalytics = () => {
                     </div>
 
                     {/* Lecture Engagement */}
-                    <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl border shadow-sm'>
+                    <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl  shadow-sm'>
                         <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 md:mb-6 gap-2 sm:gap-3'>
                             <h3 className='text-lg sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white'>
                                 Lecture Engagement
@@ -767,11 +767,10 @@ const CourseAnalytics = () => {
                                     <button
                                         key={view}
                                         onClick={() => setEngagementView(view)}
-                                        className={`px-2 py-1 text-xs rounded-md transition-colors capitalize ${
-                                            engagementView === view
+                                        className={`px-2 py-1 text-xs rounded-md transition-colors capitalize ${engagementView === view
                                                 ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
                                                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                                        }`}
+                                            }`}
                                     >
                                         {view}
                                     </button>
@@ -802,7 +801,7 @@ const CourseAnalytics = () => {
                                                     {Math.round(lecture.dropOff || 0)}%
                                                 </p>
                                             </div>
-                                            
+
                                             <div className='text-center'>
                                                 <div className='flex items-center justify-center mb-1'>
                                                     <Clock className='h-2 w-2 sm:h-3 sm:w-3 text-blue-500 mr-1' />
@@ -825,7 +824,7 @@ const CourseAnalytics = () => {
                                         </div>
 
                                         <div className='w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 sm:h-2'>
-                                            <div 
+                                            <div
                                                 className={`h-1.5 sm:h-2 rounded-full transition-all duration-500 ${getCompletionBarColor(100 - lecture.dropOff)}`}
                                                 style={{ width: `${Math.max(0, 100 - lecture.dropOff)}%` }}
                                             />
@@ -844,7 +843,7 @@ const CourseAnalytics = () => {
                 </div>
 
                 {/* Recent Activity */}
-                <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl border shadow-sm mt-4 sm:mt-6 md:mt-8'>
+                <div className='bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 rounded-xl  shadow-sm mt-4 sm:mt-6 md:mt-8'>
                     <h3 className='text-lg sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-6'>
                         Recent Activity
                     </h3>

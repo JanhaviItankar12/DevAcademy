@@ -100,7 +100,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50 px-3 sm:px-4 md:px-6 lg:px-8 pt-16 lg:pt-5">
       {/* Mobile Toggle Menu */}
       <MobileToggleMenu />
-      
+
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
@@ -110,7 +110,7 @@ const Dashboard = () => {
       )}
 
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border mb-6">
+      <div className="bg-white rounded-xl shadow-sm  mb-6">
         <div className="px-4 sm:px-6 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -138,7 +138,7 @@ const Dashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Total Revenue */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm  hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg sm:text-base font-medium">Total Revenue</p>
@@ -153,7 +153,7 @@ const Dashboard = () => {
           </div>
 
           {/* Total Students */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm  hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg sm:text-base font-medium">Total Students</p>
@@ -168,7 +168,7 @@ const Dashboard = () => {
           </div>
 
           {/* Total Courses */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm  hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg sm:text-base font-medium">Total Courses</p>
@@ -184,7 +184,7 @@ const Dashboard = () => {
           </div>
 
           {/* Average Rating */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm  hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg sm:text-base font-medium">Average Rating</p>
@@ -201,8 +201,8 @@ const Dashboard = () => {
         </div>
 
         {/* Courses Section */}
-        <div id="courses-section" className="bg-white rounded-xl shadow-sm border mb-6 sm:mb-8">
-          <div className="p-4 sm:p-6 border-b">
+        <div id="courses-section" className="bg-white rounded-xl shadow-sm  mb-6 sm:mb-8">
+          <div className="p-4 sm:p-6 ">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Your Courses</h2>
               {courses.length > 5 && (
@@ -215,7 +215,7 @@ const Dashboard = () => {
               )}
             </div>
           </div>
-          
+
           {courses.length === 0 ? (
             <div className="p-8 sm:p-12 text-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -291,8 +291,8 @@ const Dashboard = () => {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center  px-3 py-1 rounded-full text-sm font-medium ${course.isPublished
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                             }`}>
                             {course.isPublished ? 'Published' : 'Draft'}
                           </span>
@@ -365,8 +365,8 @@ const Dashboard = () => {
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${course.isPublished
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                             }`}>
                             {course.isPublished ? 'Live' : 'Draft'}
                           </span>
@@ -388,7 +388,7 @@ const Dashboard = () => {
               {/* Mobile Cards (< 640px) */}
               <div className="md:hidden space-y-3 p-4">
                 {courses.slice(0, 5).map(course => (
-                  <div key={course._id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div key={course._id} className="bg-gray-50 rounded-lg p-4  ">
                     <div className="flex items-start gap-3">
                       <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0">
                         <img
@@ -399,7 +399,7 @@ const Dashboard = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 text-lg line-clamp-2 mb-2">{course.title}</h3>
-                        
+
                         {/* Stats Row */}
                         <div className="flex flex-wrap items-center gap-3 mb-3">
                           <div className="flex items-center gap-1">
@@ -417,7 +417,7 @@ const Dashboard = () => {
                             <span className="text-sm font-medium text-blue-600">{course.recentSales || 0}</span>
                           </div>
                         </div>
-                        
+
                         {/* Revenue and Status Row */}
                         <div className="flex justify-between items-center">
                           <div>
@@ -427,8 +427,8 @@ const Dashboard = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className={`text-sm px-2 py-1 rounded-full ${course.isPublished
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-700'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-700'
                               }`}>
                               {course.isPublished ? 'Published' : 'Draft'}
                             </span>
@@ -450,11 +450,11 @@ const Dashboard = () => {
         </div>
 
         {/* Transactions Section */}
-        <div id="transactions-section" className="bg-white rounded-xl shadow-sm border">
-          <div className="p-4 sm:p-6 border-b">
+        <div id="transactions-section" className="bg-white rounded-xl shadow-sm ">
+          <div className="p-4 sm:p-6 ">
             <h2 className="text-xl sm:text-xl lg:text-2xl font-bold text-gray-900">Recent Transactions</h2>
           </div>
-          
+
           {recentTransactions.length === 0 ? (
             <div className="p-8 sm:p-12 text-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -542,18 +542,18 @@ const Dashboard = () => {
                           ₹{transaction.amount.toLocaleString()}
                         </span>
                       </div>
-                      
+
                       {/* Course Title */}
                       <div className="font-medium text-gray-900 text-lg line-clamp-2">
                         {transaction.courseTitle}
                       </div>
-                      
+
                       {/* Student Info */}
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Users size={12} className="text-gray-400" />
                         <span className="truncate">{transaction.studentName}</span>
                       </div>
-                      
+
                       {/* Status Badge */}
                       <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
                         <span className="text-sm text-gray-500">

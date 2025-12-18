@@ -550,7 +550,7 @@ const handleSeeking = (e) => {
                 <div className='bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 p-6 mb-6'>
                     <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4'>
                         <div className='flex-1'>
-                            <h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>{courseTitle}</h1>
+                            <h1 className='text-2xl font-bold text-gray-900 dark:text-white mb-2'>{courseTitle}</h1>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                     {renderStars(averageRating)}

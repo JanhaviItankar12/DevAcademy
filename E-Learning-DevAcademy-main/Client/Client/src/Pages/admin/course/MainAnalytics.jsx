@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Users, 
-  BookOpen, 
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Users,
+  BookOpen,
   Star,
   Calendar,
   Award,
@@ -26,19 +26,19 @@ const MainAnalytics = ({ navigate }) => {
   const { data: courseData } = useGetAllCoursesByInstructorQuery();
 
   const courses = courseData?.courseData || [];
-  
+
   // Generate mock trend data based on timeRange
   const generateTrendData = () => {
     const days = timeRange === 'week' ? 7 : timeRange === 'month' ? 30 : 365;
     const data = [];
     const baseRevenue = (data?.totalRevenue || 50000) / days;
     const baseStudents = (data?.totalStudents || 500) / days;
-    
+
     for (let i = days; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const variance = Math.random() * 0.4 + 0.8; // 80% to 120%
-      
+
       data.push({
         date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         revenue: Math.round(baseRevenue * variance * (days - i + 1)),
@@ -86,10 +86,10 @@ const MainAnalytics = ({ navigate }) => {
   ];
 
   // Get best performer and highest rated (computed once)
-  const bestPerformer = mutableCourses.length > 0 
+  const bestPerformer = mutableCourses.length > 0
     ? [...mutableCourses].sort((a, b) => (b.students || 0) - (a.students || 0))[0]
     : null;
-  
+
   const highestRated = mutableCourses.length > 0
     ? [...mutableCourses].sort((a, b) => (b.rating || 0) - (a.rating || 0))[0]
     : null;
@@ -103,42 +103,42 @@ const MainAnalytics = ({ navigate }) => {
     avgRating: Number((Number(data?.averageRating) || 0).toFixed(1)),
     revenueGrowth: data?.revenuAgragateGrowth || 0,
     studentGrowth: data?.studentAgregateGrowth || 0,
-    avgRevenuePerStudent: data?.totalRevenue && data?.totalStudents 
-      ? Math.round(data.totalRevenue / data.totalStudents) 
+    avgRevenuePerStudent: data?.totalRevenue && data?.totalStudents
+      ? Math.round(data.totalRevenue / data.totalStudents)
       : 0,
     completionRate: 78 // Mock data
   };
 
   if (isLoading) {
     return (
-      <LoadingSpinner/>
+      <LoadingSpinner />
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 mt-5">
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
+      <div className="bg-white  sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-             
+
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
                 <p className="text-gray-600 mt-1">Comprehensive insights into your performance</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <select 
+              <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value)}
-                className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="px-4 py-2  rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="week">Last 7 days</option>
                 <option value="month">Last 30 days</option>
                 <option value="year">Last year</option>
               </select>
-              
+
             </div>
           </div>
         </div>
@@ -147,12 +147,12 @@ const MainAnalytics = ({ navigate }) => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg font-medium">Total Revenue</p>
                 <h3 className="text-2xl font-bold text-gray-900 mt-2">₹{stats.totalRevenue.toLocaleString()}</h3>
-               
+
               </div>
               <div className="bg-green-100 p-3 rounded-lg">
                 <IndianRupee className="text-green-600" size={20} />
@@ -160,12 +160,12 @@ const MainAnalytics = ({ navigate }) => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg font-medium">Total Students</p>
                 <h3 className="text-2xl font-bold text-gray-900 mt-2">{stats.totalStudents.toLocaleString()}</h3>
-                
+
               </div>
               <div className="bg-blue-100 p-3 rounded-lg">
                 <Users className="text-blue-600" size={20} />
@@ -173,7 +173,7 @@ const MainAnalytics = ({ navigate }) => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg font-medium">Avg Revenue/Student</p>
@@ -186,7 +186,7 @@ const MainAnalytics = ({ navigate }) => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-lg font-medium">Average Rating</p>
@@ -203,30 +203,28 @@ const MainAnalytics = ({ navigate }) => {
         {/* Revenue & Enrollment Trends */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Revenue Trend */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Revenue Trend</h3>
                 <p className="text-sm text-gray-600">Daily revenue over time</p>
               </div>
               <div className="flex gap-2">
-                <button 
+                <button
                   onClick={() => setSelectedMetric('revenue')}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                    selectedMetric === 'revenue' 
-                      ? 'bg-blue-100 text-blue-700' 
+                  className={`px-3 py-1 rounded-lg text-sm font-medium ${selectedMetric === 'revenue'
+                      ? 'bg-blue-100 text-blue-700'
                       : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   Revenue
                 </button>
-                <button 
+                <button
                   onClick={() => setSelectedMetric('students')}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                    selectedMetric === 'students' 
-                      ? 'bg-blue-100 text-blue-700' 
+                  className={`px-3 py-1 rounded-lg text-sm font-medium ${selectedMetric === 'students'
+                      ? 'bg-blue-100 text-blue-700'
                       : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   Students
                 </button>
@@ -236,27 +234,27 @@ const MainAnalytics = ({ navigate }) => {
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Area 
-                  type="monotone" 
-                  dataKey={selectedMetric} 
-                  stroke="#3b82f6" 
-                  fillOpacity={1} 
-                  fill="url(#colorRevenue)" 
+                <Area
+                  type="monotone"
+                  dataKey={selectedMetric}
+                  stroke="#3b82f6"
+                  fillOpacity={1}
+                  fill="url(#colorRevenue)"
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
           {/* Enrollments Trend */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-900">Daily Enrollments</h3>
               <p className="text-sm text-gray-600">New student enrollments per day</p>
@@ -267,10 +265,10 @@ const MainAnalytics = ({ navigate }) => {
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="enrollments" 
-                  stroke="#10b981" 
+                <Line
+                  type="monotone"
+                  dataKey="enrollments"
+                  stroke="#10b981"
                   strokeWidth={2}
                   dot={{ fill: '#10b981', r: 3 }}
                 />
@@ -282,7 +280,7 @@ const MainAnalytics = ({ navigate }) => {
         {/* Course Performance & Revenue Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Top Performing Courses */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-900">Top Performing Courses</h3>
               <p className="text-sm text-gray-600">By student enrollment</p>
@@ -299,7 +297,7 @@ const MainAnalytics = ({ navigate }) => {
           </div>
 
           {/* Revenue Distribution */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-900">Revenue Distribution</h3>
               <p className="text-sm text-gray-600">By course contribution</p>
@@ -329,7 +327,7 @@ const MainAnalytics = ({ navigate }) => {
         {/* Rating & Status Analysis */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Rating Distribution */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-900">Rating Distribution</h3>
               <p className="text-sm text-gray-600">Course ratings breakdown</p>
@@ -346,7 +344,7 @@ const MainAnalytics = ({ navigate }) => {
           </div>
 
           {/* Course Status */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="mb-6">
               <h3 className="text-lg font-bold text-gray-900">Course Status</h3>
               <p className="text-sm text-gray-600">Published vs Draft courses</p>
@@ -393,7 +391,7 @@ const MainAnalytics = ({ navigate }) => {
         </div>
 
         {/* Performance Insights */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <div className="bg-white p-6 rounded-xl shadow-sm ">
           <div className="mb-6">
             <h3 className="text-lg font-bold text-gray-900">Performance Insights</h3>
             <p className="text-sm text-gray-600">Key takeaways and recommendations</p>

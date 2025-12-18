@@ -12,7 +12,7 @@ const AllCourse = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const coursesPerPage = 5;
   const navigate = useNavigate();
-  
+
   const { data: courseData, isLoading, isError } = useGetAllCoursesByInstructorQuery();
 
   const courses = courseData?.courseData || [];
@@ -20,9 +20,9 @@ const AllCourse = () => {
   // Filter courses based on search and status
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course?.title?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
-    const matchesStatus = filterStatus === 'all' || 
-                         (filterStatus === 'published' && course.isPublished) ||
-                         (filterStatus === 'draft' && !course.isPublished);
+    const matchesStatus = filterStatus === 'all' ||
+      (filterStatus === 'published' && course.isPublished) ||
+      (filterStatus === 'draft' && !course.isPublished);
     return matchesSearch && matchesStatus;
   });
 
@@ -32,7 +32,7 @@ const AllCourse = () => {
 
   // Sort courses
   const sortedCourses = [...filteredCourses].sort((a, b) => {
-    switch(sortBy) {
+    switch (sortBy) {
       case 'students':
         return (b.students || 0) - (a.students || 0);
       case 'revenue':
@@ -94,8 +94,8 @@ const AllCourse = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-red-600 text-lg">Error loading courses</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base"
           >
             Retry
@@ -141,7 +141,7 @@ const AllCourse = () => {
     <>
       {/* Mobile Action Menu */}
       <MobileActionMenu />
-      
+
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
@@ -155,7 +155,7 @@ const AllCourse = () => {
         <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
             <div className="flex items-center gap-3 mb-3 sm:mb-4">
-              <button 
+              <button
                 onClick={() => window.history.back()}
                 className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
               >
@@ -218,12 +218,12 @@ const AllCourse = () => {
             <div className="bg-white rounded-xl shadow-sm border p-6 sm:p-12 text-center">
               <BookOpen className="mx-auto mb-3 sm:mb-4 text-gray-400 w-10 h-10 sm:w-12 sm:h-12" />
               <p className="text-gray-500 text-base sm:text-lg">
-                {searchQuery || filterStatus !== 'all' 
-                  ? 'No courses found matching your filters' 
+                {searchQuery || filterStatus !== 'all'
+                  ? 'No courses found matching your filters'
                   : 'No courses available yet'}
               </p>
               {(searchQuery || filterStatus !== 'all') && (
-                <button 
+                <button
                   onClick={() => {
                     setSearchQuery('');
                     setFilterStatus('all');
@@ -242,14 +242,14 @@ const AllCourse = () => {
                 {currentCourses.map(course => (
                   <div key={course.id} className="bg-white rounded-xl shadow-sm border p-4">
                     <div className="flex items-start gap-3">
-                      <img 
-                        src={course.thumbnail} 
-                        alt={course.title} 
-                        className="w-16 h-12 rounded object-cover flex-shrink-0" 
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="w-16 h-12 rounded object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 text-lg line-clamp-2">{course.title}</h3>
-                        
+
                         {/* Stats Row */}
                         <div className="flex flex-wrap items-center gap-2 mt-2">
                           <div className="flex items-center gap-1 text-xs text-gray-600">
@@ -266,7 +266,7 @@ const AllCourse = () => {
                             </span>
                           </div>
                         </div>
-                        
+
                         {/* Recent Sales & Status */}
                         <div className="flex justify-between items-center mt-3">
                           <div className="flex items-center gap-1">
@@ -275,18 +275,17 @@ const AllCourse = () => {
                               {course.recentSales || 0} sales
                             </span>
                           </div>
-                          <span className={`text-sm px-2 py-0.5  rounded-full ${
-                            course.isPublished 
-                              ? 'bg-green-100 text-green-700' 
+                          <span className={`text-sm px-2 py-0.5  rounded-full ${course.isPublished
+                              ? 'bg-green-100 text-green-700'
                               : 'bg-gray-100 text-gray-700'
-                          }`}>
+                            }`}>
                             {course.isPublished ? 'Published' : 'Draft'}
                           </span>
                         </div>
-                        
+
                         {/* Action Button */}
                         <div className="mt-4">
-                          <button 
+                          <button
                             onClick={() => handleViewCourse(course.id)}
                             className="w-full cursor-pointer py-2 text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                           >
@@ -319,10 +318,10 @@ const AllCourse = () => {
                         <tr key={course.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <img 
-                                src={course.thumbnail} 
-                                alt={course.title} 
-                                className="w-16 h-12 rounded object-cover" 
+                              <img
+                                src={course.thumbnail}
+                                alt={course.title}
+                                className="w-16 h-12 rounded object-cover"
                               />
                               <div className="min-w-0">
                                 <div className="font-medium text-gray-900 text-lg truncate max-w-[200px]">{course.title}</div>
@@ -355,16 +354,15 @@ const AllCourse = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`inline-flex px-2 py-1 rounded-full text-lg font-medium ${
-                              course.isPublished 
-                                ? 'bg-green-100 text-green-700' 
+                            <span className={`inline-flex px-2 py-1 rounded-full text-lg font-medium ${course.isPublished
+                                ? 'bg-green-100 text-green-700'
                                 : 'bg-gray-100 text-gray-700'
-                            }`}>
+                              }`}>
                               {course.isPublished ? 'Published' : 'Draft'}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <button 
+                            <button
                               onClick={() => handleViewCourse(course.id)}
                               className="text-blue-600 cursor-pointer hover:text-blue-700 font-medium text-lg"
                             >
@@ -384,16 +382,15 @@ const AllCourse = () => {
                   <div className="text-sm text-gray-600 order-2 sm:order-1">
                     Showing {indexOfFirstCourse + 1} to {Math.min(indexOfLastCourse, sortedCourses.length)} of {sortedCourses.length} courses
                   </div>
-                  
+
                   <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto justify-center">
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
-                      className={`flex items-center cursor-pointer gap-1 px-3 py-2 rounded-lg border text-sm ${
-                        currentPage === 1
+                      className={`flex items-center cursor-pointer gap-1 px-3 py-2 rounded-lg border text-sm ${currentPage === 1
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
+                        }`}
                     >
                       <ChevronLeft size={16} />
                       <span className="hidden sm:inline">Previous</span>
@@ -418,11 +415,10 @@ const AllCourse = () => {
                           <button
                             key={pageNumber}
                             onClick={() => setCurrentPage(pageNumber)}
-                            className={`px-3 py-2 rounded-lg text-sm ${
-                              currentPage === pageNumber
+                            className={`px-3 py-2 rounded-lg text-sm ${currentPage === pageNumber
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-white text-gray-700 cursor-pointer hover:bg-gray-50 border'
-                            }`}
+                              }`}
                           >
                             {pageNumber}
                           </button>
@@ -433,11 +429,10 @@ const AllCourse = () => {
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}
-                      className={`flex items-center cursor-pointer gap-1 px-3 py-2 rounded-lg border text-sm ${
-                        currentPage === totalPages
+                      className={`flex items-center cursor-pointer gap-1 px-3 py-2 rounded-lg border text-sm ${currentPage === totalPages
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
+                        }`}
                     >
                       <span className="hidden sm:inline">Next</span>
                       <ChevronRight size={16} />

@@ -1,17 +1,17 @@
 import React from 'react';
 import { ArrowLeft, Edit, Users, DollarSign, Star, BookOpen, Calendar, TrendingUp, Loader2, IndianRupee } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {  useGetCourseInfoQuery } from '@/features/api/courseApi';
+import { useGetCourseInfoQuery } from '@/features/api/courseApi';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 const CourseDetails = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
-  
-  
-  const { data, isLoading, isError } =useGetCourseInfoQuery(courseId);
-  
+
+
+  const { data, isLoading, isError } = useGetCourseInfoQuery(courseId);
+
   const course = data?.course;
 
 
@@ -26,7 +26,7 @@ const CourseDetails = () => {
 
   if (isLoading) {
     return (
-     <LoadingSpinner/>
+      <LoadingSpinner />
     );
   }
 
@@ -35,7 +35,7 @@ const CourseDetails = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 text-xl mb-4">Failed to load course details</p>
-          <button 
+          <button
             onClick={handleBack}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
@@ -50,11 +50,11 @@ const CourseDetails = () => {
   const totalStudents = course.enrolledStudents?.length || 0;
   const totalRevenue = totalStudents * (course.coursePrice || 0);
   const totalReviews = course.reviews?.length || 0;
-  const averageRating = totalReviews > 0 
+  const averageRating = totalReviews > 0
     ? (course.reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews).toFixed(1)
     : 0;
   const totalLectures = course.lectures?.length || 0;
-  
+
   // Calculate recent sales (enrollments in last 30 days)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -65,19 +65,19 @@ const CourseDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 mt-5">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white ">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={handleBack}
               className="p-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft size={24} className="text-gray-600" />
             </button>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">Course Details</h1>
+              <h1 className="text-xl font-bold text-gray-900">Course Details</h1>
             </div>
-            <button 
+            <button
               onClick={handleEdit}
               className="flex cursor-pointer items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
@@ -90,11 +90,11 @@ const CourseDetails = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Course Header Card */}
-        <div className="bg-white rounded-xl shadow-sm border mb-6 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm  mb-6 overflow-hidden">
           <div className="md:flex">
             <div className="md:w-1/3">
-              <img 
-                src={course.courseThumbnail || 'https://via.placeholder.com/800x600?text=No+Image'} 
+              <img
+                src={course.courseThumbnail || 'https://via.placeholder.com/800x600?text=No+Image'}
                 alt={course.courseTitle}
                 className="w-full h-64 md:max-h-96 object-contain bg-gray-50"
               />
@@ -102,16 +102,15 @@ const CourseDetails = () => {
             <div className="md:w-2/3 p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">{course.courseTitle}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{course.courseTitle}</h2>
                   {course.subTitle && (
                     <p className="text-lg text-gray-600 mb-4">{course.subTitle}</p>
                   )}
                 </div>
-                <span className={`ml-4 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${
-                  course.isPublished 
-                    ? 'bg-green-100 text-green-700' 
+                <span className={`ml-4 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${course.isPublished
+                    ? 'bg-green-100 text-green-700'
                     : 'bg-gray-100 text-gray-700'
-                }`}>
+                  }`}>
                   {course.isPublished ? 'Published' : 'Draft'}
                 </span>
               </div>
@@ -152,7 +151,7 @@ const CourseDetails = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           {/* Total Students */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Total Students</p>
@@ -165,7 +164,7 @@ const CourseDetails = () => {
           </div>
 
           {/* Total Revenue */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
@@ -178,7 +177,7 @@ const CourseDetails = () => {
           </div>
 
           {/* Average Rating */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Average Rating</p>
@@ -195,7 +194,7 @@ const CourseDetails = () => {
           </div>
 
           {/* Recent Sales */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="bg-white p-6 rounded-xl shadow-sm ">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Recent Sales</p>
@@ -212,15 +211,15 @@ const CourseDetails = () => {
         {/* Description and Content Info */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Description */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border p-6">
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm  p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Course Description</h3>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{__html:course.description}}>
-              
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: course.description }}>
+
             </p>
           </div>
 
           {/* Course Content Info */}
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white rounded-xl shadow-sm  p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Course Content</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">

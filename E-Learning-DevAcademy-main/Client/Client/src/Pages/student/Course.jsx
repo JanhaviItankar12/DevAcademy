@@ -7,37 +7,37 @@ import { Link } from 'react-router-dom'
 
 
 const Course = ({ course }) => {
-    
-    const courseId=course?._id;
-    
+
+    const courseId = course?._id;
+
     return (
         <Link to={`/course-detail/${courseId}`}>
             <Card className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 p-0 h-full flex flex-col">
                 {/* Fixed height image container */}
-               <div className="relative w-full h-48 bg-white flex items-center justify-center overflow-hidden">
-  <img
-    src={course?.courseThumbnail || "https://github.com/shadcn.png"}
-    alt={course?.courseTitle || "Course thumbnail"}
-    className="max-w-full max-h-full object-contain p-2"
-    onError={(e) => {
-      e.currentTarget.src = "https://github.com/shadcn.png";
-    }}
-  />
-</div>
+                <div className="relative w-full h-48 bg-white flex items-center justify-center overflow-hidden">
+                    <img
+                        src={course?.courseThumbnail || "https://github.com/shadcn.png"}
+                        alt={course?.courseTitle || "Course thumbnail"}
+                        className="max-w-full max-h-full object-contain p-2"
+                        onError={(e) => {
+                            e.currentTarget.src = "https://github.com/shadcn.png";
+                        }}
+                    />
+                </div>
 
 
-                
+
                 {/* Content section */}
                 <CardContent className="px-5 py-4 space-y-3 flex-grow flex flex-col">
                     <h1 className="hover:underline font-bold text-lg truncate leading-tight">
                         {course?.courseTitle}
                     </h1>
-                    
+
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
                             <Avatar className="h-8 w-8 flex-shrink-0">
-                                <AvatarImage 
-                                    src={course?.creator?.photoUrl || 'https://github.com/shadcn.png'} 
+                                <AvatarImage
+                                    src={course?.creator?.photoUrl || 'https://github.com/shadcn.png'}
                                     alt={course?.creator?.name || 'Creator-Name'}
                                 />
                                 <AvatarFallback>
@@ -52,7 +52,7 @@ const Course = ({ course }) => {
                             {course?.courseLevel}
                         </Badge>
                     </div>
-                    
+
                     {/* Price section - pushed to bottom */}
                     <div className="mt-auto pt-2">
                         <span className="text-lg font-bold text-green-600 dark:text-green-400">

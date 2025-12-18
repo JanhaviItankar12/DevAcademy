@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, BadgeInfo, PlayCircle, Lock, Edit, Settings, Eye, BarChart3, Users,ChevronLeft,ChevronRight } from 'lucide-react';
+import { ArrowLeft, BadgeInfo, PlayCircle, Lock, Edit, Settings, Eye, BarChart3, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {  useGetCourseDetailWithPurchaseStatusQuery } from '@/features/api/courseApi';
+import { useGetCourseDetailWithPurchaseStatusQuery } from '@/features/api/courseApi';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ReactPlayer from 'react-player';
 
@@ -10,17 +10,17 @@ const CoursePreview = () => {
     const navigate = useNavigate();
     const params = useParams();
     const courseId = params.courseId;
-    
-   
-    const {data: courseData,isLoading,isError,refetch} = useGetCourseDetailWithPurchaseStatusQuery(courseId);
-    
+
+
+    const { data: courseData, isLoading, isError, refetch } = useGetCourseDetailWithPurchaseStatusQuery(courseId);
+
     const course = courseData?.course;
 
 
 
-   
-   
-    
+
+
+
     const [currentLecturePage, setCurrentLecturePage] = useState(1);
     const lecturesPerPage = 5;
 
@@ -59,37 +59,34 @@ const CoursePreview = () => {
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`p-2 rounded-lg border transition-colors ${
-                        currentPage === 1
+                    className={`p-2 rounded-lg border transition-colors ${currentPage === 1
                             ? 'border-gray-200 text-gray-400 cursor-not-allowed'
                             : 'border-purple-300 hover:bg-purple-50 text-purple-600'
-                    }`}
+                        }`}
                 >
                     <ChevronLeft className='h-4 w-4' />
                 </button>
-                
+
                 {[...Array(totalPages)].map((_, index) => (
                     <button
                         key={index + 1}
                         onClick={() => onPageChange(index + 1)}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            currentPage === index + 1
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === index + 1
                                 ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
                                 : 'border border-purple-300 hover:bg-purple-50 text-gray-700'
-                        }`}
+                            }`}
                     >
                         {index + 1}
                     </button>
                 ))}
-                
+
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`p-2 rounded-lg border transition-colors ${
-                        currentPage === totalPages
+                    className={`p-2 rounded-lg border transition-colors ${currentPage === totalPages
                             ? 'border-gray-200 text-gray-400 cursor-not-allowed'
                             : 'border-purple-300 hover:bg-purple-50 text-purple-600'
-                    }`}
+                        }`}
                 >
                     <ChevronRight className='h-4 w-4' />
                 </button>
@@ -100,11 +97,11 @@ const CoursePreview = () => {
     return (
         <div className='min-h-screen  bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800'>
             {/* Instructor Header */}
-           <div className='bg-white mt-10 dark:bg-gray-800 border-b border-purple-100 dark:border-gray-700 shadow-sm'>
+            <div className='bg-white mt-10 dark:bg-gray-800 border-b border-purple-100 dark:border-gray-700 shadow-sm'>
                 <div className='max-w-7xl mx-auto px-4 md:px-8 py-4'>
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
-                            <button 
+                            <button
                                 onClick={() => navigate(-1)}
                                 className='p-2 cursor-pointer hover:bg-purple-50 dark:hover:bg-gray-700 rounded-lg transition-colors'
                             >
@@ -116,7 +113,7 @@ const CoursePreview = () => {
                             </div>
                         </div>
                         <div className='flex items-center gap-2'>
-                            <button 
+                            <button
                                 onClick={handleViewAnalytics}
                                 className='flex cursor-pointer items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-colors'
                             >
@@ -135,20 +132,20 @@ const CoursePreview = () => {
                     <div className='max-w-7xl mx-auto py-12 px-4 md:px-8'>
                         <h1 className='font-bold text-3xl md:text-4xl mb-3'>{course?.courseTitle}</h1>
                         <p className='text-lg md:text-xl mb-4 text-purple-100'>{course?.subTitle}</p>
-                        
+
                         <div className='flex flex-wrap items-center gap-4 text-sm md:text-base'>
                             <div className='flex items-center gap-2'>
                                 <span className='text-purple-200'>Created by</span>
                                 <span className='font-semibold text-white'>{course?.creator?.name}</span>
                             </div>
-                            
+
                             <div className='flex items-center gap-2'>
                                 <BadgeInfo size={16} className='text-purple-200' />
                                 <span className='text-purple-100'>
                                     Updated {new Date(course?.createdAt).toLocaleDateString()}
                                 </span>
                             </div>
-                            
+
                             <div className='flex items-center gap-2'>
                                 <span className='text-purple-100'>
                                     {course?.enrolledStudents?.length || 0} students enrolled
@@ -166,8 +163,8 @@ const CoursePreview = () => {
                             {/* Description */}
                             <div className='bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 p-6'>
                                 <h2 className='font-bold text-2xl mb-4 text-gray-900 dark:text-white'>Description</h2>
-                                <p className='text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line' dangerouslySetInnerHTML={{__html:course.description}}>
-                                    
+                                <p className='text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line' dangerouslySetInnerHTML={{ __html: course.description }}>
+
                                 </p>
                             </div>
 
@@ -181,8 +178,8 @@ const CoursePreview = () => {
                                 </div>
                                 <div className='p-6 space-y-2'>
                                     {currentLectures.map((lecture, index) => (
-                                        <div 
-                                            key={index} 
+                                        <div
+                                            key={index}
                                             className='flex items-center gap-3 p-3 hover:bg-purple-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors border border-gray-100 dark:border-gray-700'
                                         >
                                             <div className='w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center'>
@@ -198,8 +195,8 @@ const CoursePreview = () => {
                                             </div>
                                         </div>
                                     ))}
-                                    
-                                    <Pagination 
+
+                                    <Pagination
                                         currentPage={currentLecturePage}
                                         totalPages={totalLecturePages}
                                         onPageChange={setCurrentLecturePage}
@@ -240,7 +237,7 @@ const CoursePreview = () => {
                                     {/* Fixed Video Container */}
                                     <div className='relative w-full bg-black' style={{ height: '250px' }}>
                                         {courseData?.previewVideoUrl ? (
-                                            <ReactPlayer 
+                                            <ReactPlayer
                                                 width="100%"
                                                 height="100%"
                                                 url={courseData?.previewVideoUrl}
@@ -268,7 +265,7 @@ const CoursePreview = () => {
                                         </div>
 
                                         <div className='h-px bg-gray-200 dark:bg-gray-600'></div>
-                                        
+
                                         <div>
                                             <p className='text-sm text-gray-500 dark:text-gray-400 mb-2'>
                                                 Course Price
@@ -280,18 +277,18 @@ const CoursePreview = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Action Buttons */}
                                     <div className='p-6 pt-0 space-y-3'>
-                                        <button 
+                                        <button
                                             onClick={handleViewAnalytics}
                                             className='w-full cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2'
                                         >
                                             <BarChart3 className='h-4 w-4' />
                                             View Analytics
                                         </button>
-                                        
-                                        <button 
+
+                                        <button
                                             onClick={handleEnrolledStudent}
                                             className='w-full cursor-pointer border-2 border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2'
                                         >

@@ -140,10 +140,7 @@ const handleSubmit = async (e) => {
       question: "Do you offer certificates?",
       answer: "Yes! Upon completing a course, you'll receive a verified certificate that you can share on LinkedIn and your resume."
     },
-    {
-      question: "Can I get a refund?",
-      answer: "We offer a 30-day money-back guarantee if you're not satisfied with your course purchase."
-    },
+    
     {
       question: "How do I become an instructor?",
       answer: "Click on 'Become an Instructor' in the footer, fill out the application, and our team will review it within 3-5 business days."

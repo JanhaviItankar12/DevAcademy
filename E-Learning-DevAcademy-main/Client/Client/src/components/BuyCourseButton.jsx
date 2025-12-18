@@ -31,7 +31,7 @@ const BuyCourseButton = ({ courseId, amount, onPaymentSuccess }) => {
       const order = await createOrder({ courseId, amount }).unwrap();
 
       const options = {
-        key: "rzp_test_yFnMdlPgXudtkV",
+        key: import.meta.env.VITE_RAZORPAY_API_KEY,
         amount: order.amount,
         currency: order.currency,
         name: "DevAcademy",
@@ -81,11 +81,10 @@ const BuyCourseButton = ({ courseId, amount, onPaymentSuccess }) => {
     <Button
       onClick={handlePayment}
       disabled={isInstructor}
-      className={`w-full cursor-pointer ${
-        isInstructor
+      className={`w-full cursor-pointer ${isInstructor
           ? "bg-gray-400 cursor-not-allowed"
           : "bg-blue-500 hover:bg-blue-600"
-      }`}
+        }`}
     >
       {isInstructor ? "Instructor cannot purchase courses" : "Purchase Course"}
     </Button>

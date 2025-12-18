@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Search, Users, Mail, Calendar,ArrowLeft ,Award, TrendingUp } from 'lucide-react';
+import { Search, Users, Mail, Calendar, ArrowLeft, Award, TrendingUp } from 'lucide-react';
 import { useGetEnrolledStudentForCourseQuery } from '@/features/api/courseApi';
 import { useParams } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -13,9 +13,9 @@ export default function CourseStudentsView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 6;
-   
+
   const { data, isLoading, isError } = useGetEnrolledStudentForCourseQuery(courseId);
-   
+
   const enrolledStudents = data?.students || [];
 
   // Filter students based on search term
@@ -60,37 +60,34 @@ export default function CourseStudentsView() {
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className={`p-2 rounded-lg border transition-colors ${
-            currentPage === 1
+          className={`p-2 rounded-lg border transition-colors ${currentPage === 1
               ? 'border-gray-200 text-gray-400 cursor-not-allowed'
               : 'border-purple-300 hover:bg-purple-50 text-purple-600'
-          }`}
+            }`}
         >
           <ChevronLeft className='h-4 w-4' />
         </button>
-        
+
         {[...Array(totalPages)].map((_, index) => (
           <button
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              currentPage === index + 1
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === index + 1
                 ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
                 : 'border border-purple-300 hover:bg-purple-50 text-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
-            }`}
+              }`}
           >
             {index + 1}
           </button>
         ))}
-        
+
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`p-2 rounded-lg border transition-colors ${
-            currentPage === totalPages
+          className={`p-2 rounded-lg border transition-colors ${currentPage === totalPages
               ? 'border-gray-200 text-gray-400 cursor-not-allowed'
               : 'border-purple-300 hover:bg-purple-50 text-purple-600'
-          }`}
+            }`}
         >
           <ChevronRight className='h-4 w-4' />
         </button>
@@ -140,7 +137,7 @@ export default function CourseStudentsView() {
                 </p>
               </div>
             </div>
-            
+
             <div className="relative w-full sm:w-80">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -155,7 +152,7 @@ export default function CourseStudentsView() {
 
           {/* Loading State */}
           {isLoading ? (
-           <LoadingSpinner/>
+            <LoadingSpinner />
           ) : currentStudents.length > 0 ? (
             <>
               {/* Students Grid */}
@@ -163,7 +160,7 @@ export default function CourseStudentsView() {
                 {currentStudents.map(each => {
                   const statusBadge = getStatusBadge(each.progress);
                   const StatusIcon = statusBadge.icon;
-                  
+
                   return (
                     <div
                       key={each.studentId}
@@ -175,9 +172,9 @@ export default function CourseStudentsView() {
                           {/* Avatar with Photo or Initial */}
                           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0 overflow-hidden">
                             {each.photoUrl ? (
-                              <img 
-                                src={each.photoUrl} 
-                                alt={each.name} 
+                              <img
+                                src={each.photoUrl}
+                                alt={each.name}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
@@ -195,7 +192,7 @@ export default function CourseStudentsView() {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Student Details */}
                       <div className="space-y-3 text-sm">
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -204,7 +201,7 @@ export default function CourseStudentsView() {
                           </div>
                           <span className="truncate">{each.email}</span>
                         </div>
-                        
+
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                           <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                             <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -230,7 +227,7 @@ export default function CourseStudentsView() {
                               </span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                              <div 
+                              <div
                                 className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${each.progress}%` }}
                               ></div>
@@ -242,7 +239,7 @@ export default function CourseStudentsView() {
                   );
                 })}
               </div>
-              
+
               {/* Pagination */}
               <Pagination />
             </>
@@ -255,8 +252,8 @@ export default function CourseStudentsView() {
                 {searchTerm ? 'No students found' : 'No students enrolled yet'}
               </h3>
               <p className="text-gray-500 dark:text-gray-400">
-                {searchTerm 
-                  ? 'Try adjusting your search terms' 
+                {searchTerm
+                  ? 'Try adjusting your search terms'
                   : 'Students will appear here once they enroll in this course'}
               </p>
             </div>

@@ -40,20 +40,19 @@ const Sidebar = () => {
             {currentMenuItems.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
-                
+
                 return (
                     <Link
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                            active
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${active
                                 ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                        }`}
+                            }`}
                     >
                         <Icon size={20} />
-                        <span className='font-medium text-lg'>{item.label}</span>
+                        <span className='font-medium text-base'>{item.label}</span>
                     </Link>
                 );
             })}

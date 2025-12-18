@@ -8,8 +8,8 @@ import jwt from "jsonwebtoken";
 
 
 const razorpay = new Razorpay({
-  key_id: process.env.test_key_id,
-  key_secret: process.env.test_secret_key
+  key_id: process.env.RAZORPAY_API_KEY,
+  key_secret: process.env.RAZORPAY_SECRET_KEY
 });
 
 //create order on razorpay
@@ -45,7 +45,7 @@ export const verifyOrder = async (req, res) => {
 
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
-      .createHmac("sha256", process.env.test_secret_key)
+      .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
       .update(sign.toString())
       .digest("hex");
 
