@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedIn, userLoggedOut } from "../authSlice";
 
 
-const user_api = "http://localhost:8080/api/v1/user/";
+const user_api = "https://devacademy-ssuf.onrender.com/api/v1/user/";
 
 
 export const authApi = createApi({
