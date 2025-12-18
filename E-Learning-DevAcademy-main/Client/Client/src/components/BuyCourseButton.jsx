@@ -11,7 +11,10 @@ const BuyCourseButton = ({ courseId, amount, onPaymentSuccess }) => {
   const [verifyOrder] = useVerifyOrderMutation();
 
   const navigate = useNavigate();
-  const { user,token} = useSelector((state) => state.auth);
+  const { user} = useSelector((state) => state.auth);
+
+  const token = localStorage.getItem("token");
+
 
   
 
