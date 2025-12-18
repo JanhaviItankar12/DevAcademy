@@ -29,7 +29,7 @@ const port=process.env.port || 5000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: "https://devacademy-silk.vercel.app",
+    origin: "http://localhost:5173",
     credentials:true
 }));
 
