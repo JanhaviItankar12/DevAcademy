@@ -47,18 +47,19 @@ const Navbar = () => {
     };
 
     return (
-        <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white dark:bg-[#0A0A0A] shadow-lg' : 'bg-white dark:bg-[#0A0A0A]'} border-b dark:border-gray-800 border-gray-200`}>
-            <div className="max-w-7xl mx-auto px-6 py-4">
-                <div className="flex justify-between items-center">
-                    {/* Logo */}
-                    <div className="flex items-center space-x-2">
-                        <CodeSquareIcon className='w-8 h-8  text-purple-600' />
-                        <Link to="/">
-                            <span className="text-xl font-bold text-purple-600 dark:text-purple-400">
-                                DevAcademy
-                            </span>
-                        </Link>
-                    </div>
+        <>
+            <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white dark:bg-[#0A0A0A] shadow-lg' : 'bg-white dark:bg-[#0A0A0A]'} border-b dark:border-gray-800 border-gray-200`}>
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                    <div className="flex justify-between items-center">
+                        {/* Logo */}
+                        <div className="flex items-center space-x-2">
+                            <CodeSquareIcon className='w-8 h-8 text-purple-600' />
+                            <Link to="/">
+                                <span className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                                    DevAcademy
+                                </span>
+                            </Link>
+                        </div>
 
                         {/* Navigation Links - Desktop */}
                         {!user && isHome && (
@@ -79,7 +80,7 @@ const Navbar = () => {
                                     offset={-80}
                                     className="text-gray-700 dark:text-gray-300 hover:text-purple-600 cursor-pointer"
                                 >
-                                    Feautures
+                                    Features
                                 </ScrollLink>
                                 <ScrollLink
                                     to="reviews"
@@ -90,7 +91,6 @@ const Navbar = () => {
                                 >
                                     Reviews
                                 </ScrollLink>
-
                                 <ScrollLink
                                     to="become-instructor"
                                     smooth={true}
@@ -105,7 +105,6 @@ const Navbar = () => {
 
                         {/* Auth Buttons / User Menu */}
                         <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
-
                             {/* Mobile Menu Toggle (only for non-authenticated users on home page) */}
                             {!user && isHome && (
                                 <button
@@ -122,7 +121,7 @@ const Navbar = () => {
 
                             {user ? (
                                 <>
-                                    {/* Logged in user dropdown (unchanged) */}
+                                    {/* Logged in user dropdown */}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Avatar className="cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
@@ -199,9 +198,6 @@ const Navbar = () => {
                             ) : (
                                 // Not logged in - Sign In / Sign Up buttons
                                 <div className="flex space-x-2 sm:space-x-3">
-                                    {/* Mobile: Icon-only Sign In button */}
-
-
                                     {/* Desktop: Full Sign In button */}
                                     <Button
                                         variant="outline"
@@ -223,80 +219,80 @@ const Navbar = () => {
                             )}
                         </div>
                     </div>
-                </div>
 
-                {/* Mobile Menu (only for non-authenticated users on home page) */}
-                {!user && isHome && mobileMenuOpen && (
-                    <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0A0A0A] animate-slideDown">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-                            <div className="flex flex-col space-y-3">
-                                <ScrollLink
-                                    to="courses"
-                                    smooth={true}
-                                    duration={500}
-                                    offset={-80}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
-                                >
-                                    Courses
-                                </ScrollLink>
-                                <ScrollLink
-                                    to="features"
-                                    smooth={true}
-                                    duration={500}
-                                    offset={-80}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
-                                >
-                                    Features
-                                </ScrollLink>
-                                <ScrollLink
-                                    to="reviews"
-                                    smooth={true}
-                                    duration={500}
-                                    offset={-80}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
-                                >
-                                    Reviews
-                                </ScrollLink>
-                                <ScrollLink
-                                    to="become-instructor"
-                                    smooth={true}
-                                    duration={500}
-                                    offset={-80}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
-                                >
-                                    Become an Instructor
-                                </ScrollLink>
-                            </div>
+                    {/* Mobile Menu (only for non-authenticated users on home page) */}
+                    {!user && isHome && mobileMenuOpen && (
+                        <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0A0A0A] animate-slideDown">
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+                                <div className="flex flex-col space-y-3">
+                                    <ScrollLink
+                                        to="courses"
+                                        smooth={true}
+                                        duration={500}
+                                        offset={-80}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
+                                    >
+                                        Courses
+                                    </ScrollLink>
+                                    <ScrollLink
+                                        to="features"
+                                        smooth={true}
+                                        duration={500}
+                                        offset={-80}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
+                                    >
+                                        Features
+                                    </ScrollLink>
+                                    <ScrollLink
+                                        to="reviews"
+                                        smooth={true}
+                                        duration={500}
+                                        offset={-80}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
+                                    >
+                                        Reviews
+                                    </ScrollLink>
+                                    <ScrollLink
+                                        to="become-instructor"
+                                        smooth={true}
+                                        duration={500}
+                                        offset={-80}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="text-base text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors py-2"
+                                    >
+                                        Become an Instructor
+                                    </ScrollLink>
+                                </div>
 
-                            {/* Mobile Auth Buttons inside Menu */}
-                            <div className="mt-4 flex flex-col space-y-3">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        navigate("/login");
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    className="w-full cursor-pointer border-purple-600 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-400 dark:hover:bg-purple-900/20 py-2"
-                                >
-                                    Sign In
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        navigate("/login", { state: { tab: "signup" } });
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    className="w-full cursor-pointer bg-purple-600 hover:bg-purple-700 text-white py-2"
-                                >
-                                    Get Started Free
-                                </Button>
+                                {/* Mobile Auth Buttons inside Menu */}
+                                <div className="mt-4 flex flex-col space-y-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            navigate("/login");
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className="w-full cursor-pointer border-purple-600 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-400 dark:hover:bg-purple-900/20 py-2"
+                                    >
+                                        Sign In
+                                    </Button>
+                                    <Button
+                                        onClick={() => {
+                                            navigate("/login", { state: { tab: "signup" } });
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className="w-full cursor-pointer bg-purple-600 hover:bg-purple-700 text-white py-2"
+                                    >
+                                        Get Started Free
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </nav>
 
             {/* Mobile Menu Backdrop */}
@@ -309,6 +305,8 @@ const Navbar = () => {
         </>
     );
 };
+
+
 
 export default Navbar;
 
