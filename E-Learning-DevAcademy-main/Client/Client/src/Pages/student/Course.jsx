@@ -7,10 +7,11 @@ import { Link } from 'react-router-dom'
 
 
 const Course = ({ course }) => {
+
     const courseId = course?._id;
 
     return (
-        <Link to={`/course-detail/${courseId}`} className="block w-full">
+        <Link to={`/course-detail/${courseId}`}>
             <Card className="overflow-hidden rounded-lg dark:bg-gray-800 bg-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 p-0 h-full flex flex-col">
                 {/* Fixed height image container */}
                 <div className="relative w-full h-48 bg-white flex items-center justify-center overflow-hidden">
@@ -24,10 +25,11 @@ const Course = ({ course }) => {
                     />
                 </div>
 
+
+
                 {/* Content section */}
                 <CardContent className="px-5 py-4 space-y-3 flex-grow flex flex-col">
-                    {/* Title with 2-line truncation */}
-                    <h1 className="hover:underline font-bold text-lg line-clamp-2 leading-tight">
+                    <h1 className="hover:underline font-bold text-lg truncate leading-tight">
                         {course?.courseTitle}
                     </h1>
 
@@ -42,7 +44,6 @@ const Course = ({ course }) => {
                                     {course?.creator?.name?.charAt(0)?.toUpperCase() || 'U'}
                                 </AvatarFallback>
                             </Avatar>
-                            {/* Creator name with single-line truncation */}
                             <h1 className="font-medium text-sm truncate">
                                 {course?.creator?.name}
                             </h1>

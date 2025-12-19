@@ -137,7 +137,7 @@ const Profile = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-  
+
 
     return (
         <div className='min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800 py-12'>
@@ -269,8 +269,8 @@ const Profile = () => {
                                 {user.role === "student" && (
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Button 
-                                                variant="outline" 
+                                            <Button
+                                                variant="outline"
                                                 size="lg"
                                                 className='border-purple-300 cursor-pointer hover:bg-purple-50 hover:border-purple-400'
                                             >
@@ -288,7 +288,7 @@ const Profile = () => {
                                                     Manage your email notification settings
                                                 </DialogDescription>
                                             </DialogHeader>
-                                            
+
                                             <div className='py-4 space-y-6'>
                                                 <div className='space-y-4'>
                                                     <div className='flex items-center justify-between'>
@@ -397,8 +397,8 @@ const Profile = () => {
 
                                 {/* Instructor-specific buttons (if needed) */}
                                 {user.role === "instructor" && (
-                                    <Button 
-                                        variant="outline" 
+                                    <Button
+                                        variant="outline"
                                         size="lg"
                                         onClick={() => navigate("/instructor/course/create")}
                                         className='border-purple-300 cursor-pointer hover:bg-purple-50 hover:border-purple-400'
@@ -498,9 +498,12 @@ const Profile = () => {
                                 <>
                                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
                                         {currentCourses.map((course) => (
-                                            <div key={course._id} className='group'>
-                                                <div className='bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-purple-200 dark:border-gray-600 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2'>
-                                                    <div className="relative w-full aspect-[16/9] bg-white flex items-center justify-center">
+                                            <div key={course._id} className='group h-full'>
+                                                {/* Added fixed height to the main card container */}
+                                                <div className='bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-purple-200 dark:border-gray-600 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 flex flex-col h-[500px]'> {/* Fixed height */}
+
+                                                    {/* Image section with fixed height */}
+                                                    <div className="relative w-full h-48 flex-shrink-0 bg-white flex items-center justify-center">
                                                         <img
                                                             src={course.courseThumbnail}
                                                             alt={course.courseTitle}
@@ -508,31 +511,44 @@ const Profile = () => {
                                                         />
                                                     </div>
 
-                                                    <div className='p-6'>
-                                                        <h3 className='font-bold text-lg text-gray-900 dark:text-white mb-2 line-clamp-2'>
-                                                            {course.courseTitle}
-                                                        </h3>
-                                                        <p className='text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2'>
-                                                            {course.subTitle || 'Course description goes here...'}
-                                                        </p>
-                                                        <div className='flex items-center justify-between'>
-                                                            <span className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
-                                                                ₹ {course.coursePrice || '0'}
-                                                            </span>
-                                                            <div className='flex items-center text-sm text-gray-500'>
-                                                                <Users className='h-4 w-4 mr-1' />
-                                                                {course.enrolledStudents?.length || 0} students
-                                                            </div>
+                                                    {/* Content section that takes remaining space */}
+                                                    <div className='p-6 flex flex-col flex-grow'>
+
+                                                        {/* Title with fixed height and truncation */}
+                                                        <div className='min-h-[3.5rem] mb-2'>
+                                                            <h3 className='font-bold text-lg text-gray-900 dark:text-white line-clamp-2'>
+                                                                {course.courseTitle}
+                                                            </h3>
                                                         </div>
-                                                        <div className='mt-4 flex gap-2'>
-                                                            <Button size='sm' variant='outline' className='flex-1 cursor-pointer border-purple-300 hover:bg-purple-50' onClick={() => navigate(`/instructor/course/${course._id}`)}>
-                                                                <Edit className='h-4 w-4 mr-1' />
-                                                                Edit
-                                                            </Button>
-                                                            <Button size='sm' className='flex-1 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' onClick={() => navigate(`/instructor/course/${course._id}/preview`)}>
-                                                                <Eye className='h-4 w-4 mr-1' />
-                                                                View
-                                                            </Button>
+
+                                                        {/* Subtitle with fixed height and truncation */}
+                                                        <div className='min-h-[2.8rem] mb-4 flex-grow'>
+                                                            <p className='text-gray-600 dark:text-gray-300 text-sm line-clamp-2'>
+                                                                {course.subTitle || 'Course description goes here...'}
+                                                            </p>
+                                                        </div>
+
+                                                        {/* Bottom section with price and button */}
+                                                        <div className='mt-auto'>
+                                                            <div className='flex items-center justify-between mb-4'>
+                                                                <span className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
+                                                                    ₹ {course.coursePrice || '0'}
+                                                                </span>
+                                                                <div className='flex items-center text-sm text-gray-500'>
+                                                                    <Users className='h-4 w-4 mr-1' />
+                                                                    {course.enrolledStudents?.length || 0} students
+                                                                </div>
+                                                            </div>
+                                                            <div className='flex gap-2'>
+                                                                <Button size='sm' variant='outline' className='flex-1 cursor-pointer border-purple-300 hover:bg-purple-50' onClick={() => navigate(`/instructor/course/${course._id}`)}>
+                                                                    <Edit className='h-4 w-4 mr-1' />
+                                                                    Edit
+                                                                </Button>
+                                                                <Button size='sm' className='flex-1 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' onClick={() => navigate(`/instructor/course/${course._id}/preview`)}>
+                                                                    <Eye className='h-4 w-4 mr-1' />
+                                                                    View
+                                                                </Button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
