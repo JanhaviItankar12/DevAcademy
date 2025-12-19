@@ -34,7 +34,7 @@ const TopInstructor = () => {
           </div>
           <div>
             <h2 className="text-2xl lg:text-2xl font-bold text-gray-900">Top Instructors</h2>
-            <p className="text-lg lg:text-lg text-gray-600 mt-0.5">Best performing Instructors this month</p>
+            <p className="text-lg lg:text-lg text-gray-600 mt-0.5">Best performing Instructors this month on basis of sale</p>
           </div>
         </div>
       </div>

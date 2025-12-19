@@ -32,7 +32,7 @@ const TopCourses = () => {
           </div>
           <div>
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">Top Selling Courses</h2>
-            <p className="text-sm md:text-base text-gray-600 mt-0.5">Best performing courses this month</p>
+            <p className="text-sm md:text-base text-gray-600 mt-0.5">Best performing courses this month on the basis of sale</p>
           </div>
         </div>
       </div>

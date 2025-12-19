@@ -300,7 +300,7 @@ const Dashboard = () => {
                         <td className="px-6 py-4">
                           <button
                             onClick={() => handleViewCourse(course.id)}
-                            className="text-purple-600 hover:text-purple-700 font-medium text-sm px-3 py-1.5 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="text-purple-600 cursor-pointer hover:text-purple-700 font-medium text-sm px-3 py-1.5 hover:bg-purple-50 rounded-lg transition-colors"
                           >
                             View Details
                           </button>

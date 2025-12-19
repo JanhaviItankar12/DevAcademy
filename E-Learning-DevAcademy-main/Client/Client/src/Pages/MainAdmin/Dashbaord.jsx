@@ -119,7 +119,7 @@ const AdminDashboard = () => {
             <StatCard
               icon={Award}
               title="Completion Rate"
-              value={data?.data?.completionRate}
+              value={`${data?.data?.completionRate}%`}
               subtitle="Average across all courses"
               changeLabel="vs last month"
               color="text-orange-600"
