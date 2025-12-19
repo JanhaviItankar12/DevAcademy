@@ -16,7 +16,8 @@ export default function HomePage() {
   const { data, isLoading, isError } = useGetpublishedcourseonlevelQuery();
   const { data: dataForHeroSection } = useGetDataforHeroSectionQuery();
   const { data: dataOfReviews } = useGetReviewsforHomeQuery();
-
+  
+  console.log(user);
 
 
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,6 +9,7 @@ import DarkMode from '@/DarkMode';
 import { useLoggedOutUserMutation } from '@/features/api/authApi';
 import { Link as ScrollLink } from "react-scroll";
 import { CodeSquareIcon, Menu, X, User } from 'lucide-react';
+import { userLoggedOut } from '@/features/authSlice';
 
 const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -16,6 +17,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const { user } = useSelector(store => store.auth);
     const [loggedOutUser, { data, isSuccess }] = useLoggedOutUserMutation();
+    const dispatch = useDispatch();
 
     const location = useLocation();
     const isHome = location.pathname === "/";
@@ -43,7 +45,18 @@ const Navbar = () => {
     }, [location]);
 
     const logoutHandler = async () => {
-        await loggedOutUser();
+        try {
+            await loggedOutUser().unwrap();
+
+            //  Frontend cleanup
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            dispatch(userLoggedOut());
+            navigate("/login", { state: { tab: "login" } });
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
     };
 
     return (
