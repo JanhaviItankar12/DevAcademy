@@ -31,8 +31,8 @@ const Profile = () => {
 
     const { data, isLoading, refetch } = useLoadUserQuery();
     const [updateUser, { data: updateUserdata, isLoading: updateUserisLoading, isError, isSuccess }] = useUpdateUserMutation();
-    const { data: courseEnrolledData } = useGetEnrolledCourseOfUserQuery();
-    const { data: createdCoursesData } = useGetCreatorCoursesQuery();
+    const { data: courseEnrolledData, isLoading: isEnrolledCoursesLoading } = useGetEnrolledCourseOfUserQuery();
+    const { data: createdCoursesData, isLoading: isCreatedCoursesLoading } = useGetCreatorCoursesQuery();
     const [updatePreference, { isLoading: isUpdatingPreferences }] = useUpdatePreferenceMutation();
 
     useEffect(() => {
@@ -113,16 +113,23 @@ const Profile = () => {
         }
     };
 
-    // Loading state
+    // Main loading state
     if (isLoading || !data?.user) {
         return (
-            <LoadingSpinner />
+            <div className='min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
+                <LoadingSpinner size="large" text="Loading your profile..." />
+            </div>
         );
     }
 
     const user = data.user;
 
-    // Pagination logic
+    // Check if courses data is still loading
+    const isCoursesLoading = user.role === "student" 
+        ? isEnrolledCoursesLoading 
+        : isCreatedCoursesLoading;
+
+    // Get courses data with fallback
     const courses = user.role === "student"
         ? courseEnrolledData?.courses || []
         : createdCoursesData?.courses || [];
@@ -137,8 +144,6 @@ const Profile = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-
-
     return (
         <div className='min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:to-gray-800 py-12'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -152,10 +157,11 @@ const Profile = () => {
                     </p>
                 </div>
 
-                {/* Profile Card */}
+                {/* Profile Card - Same as before... */}
                 <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-purple-100 dark:border-gray-700'>
+                    {/* ... Keep all the profile card code exactly as you had it ... */}
+                    {/* Avatar Section */}
                     <div className='flex flex-col lg:flex-row items-center lg:items-start gap-8'>
-                        {/* Avatar Section */}
                         <div className='flex flex-col items-center'>
                             <div className='relative group'>
                                 <Avatar className="h-32 w-32 mb-4 ring-4 ring-purple-500 ring-offset-4 ring-offset-white dark:ring-offset-gray-800 transition-transform group-hover:scale-105">
@@ -395,7 +401,7 @@ const Profile = () => {
                                     </Dialog>
                                 )}
 
-                                {/* Instructor-specific buttons (if needed) */}
+                                {/* Instructor-specific buttons */}
                                 {user.role === "instructor" && (
                                     <Button
                                         variant="outline"
@@ -414,201 +420,208 @@ const Profile = () => {
 
                 {/* Courses Section */}
                 <div className='bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-purple-100 dark:border-gray-700'>
-                    {user.role === "student" ? (
-                        <>
-                            <div className='flex items-center mb-6'>
-                                <BookOpen className='h-6 w-6 text-purple-600 mr-3' />
-                                <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
-                                    Your Enrolled Courses
-                                </h2>
-                            </div>
-                            {courses.length > 0 ? (
-                                <>
-                                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                                        {currentCourses.map((course) => (
-                                            <div key={course._id} className='group'>
-                                                <Course course={course} />
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Pagination */}
-                                    {totalPages > 1 && (
-                                        <div className='flex justify-center items-center gap-2 mt-8'>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}
-                                                className='border-purple-300 hover:bg-purple-50'
-                                            >
-                                                <ChevronLeft className='h-4 w-4' />
-                                            </Button>
-
-                                            {[...Array(totalPages)].map((_, index) => (
-                                                <Button
-                                                    key={index + 1}
-                                                    variant={currentPage === index + 1 ? "default" : "outline"}
-                                                    size="sm"
-                                                    onClick={() => handlePageChange(index + 1)}
-                                                    className={currentPage === index + 1
-                                                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                                                        : 'border-purple-300 cursor-pointer hover:bg-purple-50'}
-                                                >
-                                                    {index + 1}
-                                                </Button>
-                                            ))}
-
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === totalPages}
-                                                className='border-purple-300 cursor-pointer hover:bg-purple-50'
-                                            >
-                                                <ChevronRight className='h-4 w-4' />
-                                            </Button>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className='text-center py-12'>
-                                    <BookOpen className='h-16 w-16 text-gray-400 mx-auto mb-4' />
-                                    <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
-                                        No Enrolled Courses Yet
-                                    </h3>
-                                    <p className='text-gray-600 dark:text-gray-300 mb-6'>
-                                        Start your learning journey by enrolling in courses
-                                    </p>
-                                    <Button onClick={() => navigate(`/courses`)} className='bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'>
-                                        Browse Courses
-                                    </Button>
-                                </div>
-                            )}
-                        </>
+                    {/* Show loader while courses are loading */}
+                    {isCoursesLoading ? (
+                        <div className='py-16 text-center'>
+                            <div className='inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4'></div>
+                            <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
+                                Loading {user.role === "student" ? "Enrolled" : "Created"} Courses...
+                            </h3>
+                            <p className='text-gray-600 dark:text-gray-300'>
+                                Please wait while we fetch your course information
+                            </p>
+                        </div>
                     ) : (
                         <>
-                            <div className='flex items-center mb-6'>
-                                <GraduationCap className='h-6 w-6 text-purple-600 mr-3' />
-                                <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
-                                    Your Created Courses
-                                </h2>
-                            </div>
-                            {courses.length > 0 ? (
+                            {user.role === "student" ? (
                                 <>
-                                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                                        {currentCourses.map((course) => (
-                                            <div key={course._id} className='group h-full'>
-                                                {/* Added fixed height to the main card container */}
-                                                <div className='bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-purple-200 dark:border-gray-600 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 flex flex-col h-[500px]'> {/* Fixed height */}
-
-                                                    {/* Image section with fixed height */}
-                                                    <div className="relative w-full h-48 flex-shrink-0 bg-white flex items-center justify-center">
-                                                        <img
-                                                            src={course.courseThumbnail}
-                                                            alt={course.courseTitle}
-                                                            className="w-full h-full object-contain p-2"
-                                                        />
-                                                    </div>
-
-                                                    {/* Content section that takes remaining space */}
-                                                    <div className='p-6 flex flex-col flex-grow'>
-
-                                                        {/* Title with fixed height and truncation */}
-                                                        <div className='min-h-[3.5rem] mb-2'>
-                                                            <h3 className='font-bold text-lg text-gray-900 dark:text-white line-clamp-2'>
-                                                                {course.courseTitle}
-                                                            </h3>
-                                                        </div>
-
-                                                        {/* Subtitle with fixed height and truncation */}
-                                                        <div className='min-h-[2.8rem] mb-4 flex-grow'>
-                                                            <p className='text-gray-600 dark:text-gray-300 text-sm line-clamp-2'>
-                                                                {course.subTitle || 'Course description goes here...'}
-                                                            </p>
-                                                        </div>
-
-                                                        {/* Bottom section with price and button */}
-                                                        <div className='mt-auto'>
-                                                            <div className='flex items-center justify-between mb-4'>
-                                                                <span className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
-                                                                    ₹ {course.coursePrice || '0'}
-                                                                </span>
-                                                                <div className='flex items-center text-sm text-gray-500'>
-                                                                    <Users className='h-4 w-4 mr-1' />
-                                                                    {course.enrolledStudents?.length || 0} students
-                                                                </div>
-                                                            </div>
-                                                            <div className='flex gap-2'>
-                                                                <Button size='sm' variant='outline' className='flex-1 cursor-pointer border-purple-300 hover:bg-purple-50' onClick={() => navigate(`/instructor/course/${course._id}`)}>
-                                                                    <Edit className='h-4 w-4 mr-1' />
-                                                                    Edit
-                                                                </Button>
-                                                                <Button size='sm' className='flex-1 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' onClick={() => navigate(`/instructor/course/${course._id}/preview`)}>
-                                                                    <Eye className='h-4 w-4 mr-1' />
-                                                                    View
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                    <div className='flex items-center mb-6'>
+                                        <BookOpen className='h-6 w-6 text-purple-600 mr-3' />
+                                        <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
+                                            Your Enrolled Courses
+                                        </h2>
                                     </div>
+                                    {courses.length > 0 ? (
+                                        <>
+                                            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                                                {currentCourses.map((course) => (
+                                                    <div key={course._id} className='group'>
+                                                        <Course course={course} />
+                                                    </div>
+                                                ))}
+                                            </div>
 
-                                    {/* Pagination */}
-                                    {totalPages > 1 && (
-                                        <div className='flex justify-center items-center gap-2 mt-8'>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}
-                                                className='border-purple-300 cursor-pointer hover:bg-purple-50'
-                                            >
-                                                <ChevronLeft className='h-4 w-4' />
-                                            </Button>
+                                            {/* Pagination */}
+                                            {totalPages > 1 && (
+                                                <div className='flex justify-center items-center gap-2 mt-8'>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handlePageChange(currentPage - 1)}
+                                                        disabled={currentPage === 1}
+                                                        className='border-purple-300 hover:bg-purple-50'
+                                                    >
+                                                        <ChevronLeft className='h-4 w-4' />
+                                                    </Button>
 
-                                            {[...Array(totalPages)].map((_, index) => (
-                                                <Button
-                                                    key={index + 1}
-                                                    variant={currentPage === index + 1 ? "default" : "outline"}
-                                                    size="sm"
-                                                    onClick={() => handlePageChange(index + 1)}
-                                                    className={currentPage === index + 1
-                                                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                                                        : 'border-purple-300 cursor-pointer hover:bg-purple-50'}
-                                                >
-                                                    {index + 1}
-                                                </Button>
-                                            ))}
+                                                    {[...Array(totalPages)].map((_, index) => (
+                                                        <Button
+                                                            key={index + 1}
+                                                            variant={currentPage === index + 1 ? "default" : "outline"}
+                                                            size="sm"
+                                                            onClick={() => handlePageChange(index + 1)}
+                                                            className={currentPage === index + 1
+                                                                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                                                                : 'border-purple-300 cursor-pointer hover:bg-purple-50'}
+                                                        >
+                                                            {index + 1}
+                                                        </Button>
+                                                    ))}
 
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === totalPages}
-                                                className='border-purple-300 cursor-pointer hover:bg-purple-50'
-                                            >
-                                                <ChevronRight className='h-4 w-4' />
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handlePageChange(currentPage + 1)}
+                                                        disabled={currentPage === totalPages}
+                                                        className='border-purple-300 cursor-pointer hover:bg-purple-50'
+                                                    >
+                                                        <ChevronRight className='h-4 w-4' />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className='text-center py-12'>
+                                            <BookOpen className='h-16 w-16 text-gray-400 mx-auto mb-4' />
+                                            <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
+                                                No Enrolled Courses Yet
+                                            </h3>
+                                            <p className='text-gray-600 dark:text-gray-300 mb-6'>
+                                                Start your learning journey by enrolling in courses
+                                            </p>
+                                            <Button onClick={() => navigate(`/courses`)} className='bg-gradient-to-r cursor-pointer from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'>
+                                                Browse Courses
                                             </Button>
                                         </div>
                                     )}
                                 </>
                             ) : (
-                                <div className='text-center py-12'>
-                                    <GraduationCap className='h-16 w-16 text-gray-400 mx-auto mb-4' />
-                                    <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
-                                        No Courses Created Yet
-                                    </h3>
-                                    <p className='text-gray-600 dark:text-gray-300 mb-6'>
-                                        Share your knowledge by creating your first course
-                                    </p>
-                                    <Button className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' onClick={() => navigate("/instructor/course/create")}>
-                                        <Plus className='h-4 w-4 mr-2 cursor-pointer' />
-                                        Create Course
-                                    </Button>
-                                </div>
+                                <>
+                                    <div className='flex items-center mb-6'>
+                                        <GraduationCap className='h-6 w-6 text-purple-600 mr-3' />
+                                        <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
+                                            Your Created Courses
+                                        </h2>
+                                    </div>
+                                    {courses.length > 0 ? (
+                                        <>
+                                            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                                                {currentCourses.map((course) => (
+                                                    <div key={course._id} className='group h-full'>
+                                                        <div className='bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-purple-200 dark:border-gray-600 overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 flex flex-col h-[500px]'>
+                                                            <div className="relative w-full h-48 flex-shrink-0 bg-white flex items-center justify-center">
+                                                                <img
+                                                                    src={course.courseThumbnail}
+                                                                    alt={course.courseTitle}
+                                                                    className="w-full h-full object-contain p-2"
+                                                                />
+                                                            </div>
+
+                                                            <div className='p-6 flex flex-col flex-grow'>
+                                                                <div className='min-h-[3.5rem] mb-2'>
+                                                                    <h3 className='font-bold text-lg text-gray-900 dark:text-white line-clamp-2'>
+                                                                        {course.courseTitle}
+                                                                    </h3>
+                                                                </div>
+
+                                                                <div className='min-h-[2.8rem] mb-4 flex-grow'>
+                                                                    <p className='text-gray-600 dark:text-gray-300 text-sm line-clamp-2'>
+                                                                        {course.subTitle || 'Course description goes here...'}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div className='mt-auto'>
+                                                                    <div className='flex items-center justify-between mb-4'>
+                                                                        <span className='text-2xl font-bold text-purple-600 dark:text-purple-400'>
+                                                                            ₹ {course.coursePrice || '0'}
+                                                                        </span>
+                                                                        <div className='flex items-center text-sm text-gray-500'>
+                                                                            <Users className='h-4 w-4 mr-1' />
+                                                                            {course.enrolledStudents?.length || 0} students
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className='flex gap-2'>
+                                                                        <Button size='sm' variant='outline' className='flex-1 cursor-pointer border-purple-300 hover:bg-purple-50' onClick={() => navigate(`/instructor/course/${course._id}`)}>
+                                                                            <Edit className='h-4 w-4 mr-1' />
+                                                                            Edit
+                                                                        </Button>
+                                                                        <Button size='sm' className='flex-1 cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' onClick={() => navigate(`/instructor/course/${course._id}/preview`)}>
+                                                                            <Eye className='h-4 w-4 mr-1' />
+                                                                            View
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Pagination */}
+                                            {totalPages > 1 && (
+                                                <div className='flex justify-center items-center gap-2 mt-8'>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handlePageChange(currentPage - 1)}
+                                                        disabled={currentPage === 1}
+                                                        className='border-purple-300 cursor-pointer hover:bg-purple-50'
+                                                    >
+                                                        <ChevronLeft className='h-4 w-4' />
+                                                    </Button>
+
+                                                    {[...Array(totalPages)].map((_, index) => (
+                                                        <Button
+                                                            key={index + 1}
+                                                            variant={currentPage === index + 1 ? "default" : "outline"}
+                                                            size="sm"
+                                                            onClick={() => handlePageChange(index + 1)}
+                                                            className={currentPage === index + 1
+                                                                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                                                                : 'border-purple-300 cursor-pointer hover:bg-purple-50'}
+                                                        >
+                                                            {index + 1}
+                                                        </Button>
+                                                    ))}
+
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handlePageChange(currentPage + 1)}
+                                                        disabled={currentPage === totalPages}
+                                                        className='border-purple-300 cursor-pointer hover:bg-purple-50'
+                                                    >
+                                                        <ChevronRight className='h-4 w-4' />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className='text-center py-12'>
+                                            <GraduationCap className='h-16 w-16 text-gray-400 mx-auto mb-4' />
+                                            <h3 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
+                                                No Courses Created Yet
+                                            </h3>
+                                            <p className='text-gray-600 dark:text-gray-300 mb-6'>
+                                                Share your knowledge by creating your first course
+                                            </p>
+                                            <Button className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' onClick={() => navigate("/instructor/course/create")}>
+                                                <Plus className='h-4 w-4 mr-2 cursor-pointer' />
+                                                Create Course
+                                            </Button>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </>
                     )}
