@@ -8,17 +8,36 @@ export const getCourseProgress = async (req, res) => {
 
         // step1:fetch the user course progress
         let courseProgress=await CourseProgress.findOne({courseId,userId}).populate("courseId");
-        const courseDetails=await Course.findById(courseId).populate("lectures").populate("reviews.student","name email photoUrl");
+        const courseDetails=await Course.findById(courseId)
+            .populate("lectures")
+            .populate({
+                path: "reviews",
+                populate: {
+                    path: "student",
+                    select: "name email photoUrl"
+                }
+            });
 
         if(!courseDetails){
             return res.status(404).json({ message: "Course not found" });
         }
 
+        // Filter reviews to show only current user's review
+        const userReview = courseDetails.reviews.filter(
+            review => review.student && review.student._id.toString() === userId
+        );
+
+        // Create a modified courseDetails with only user's review
+        const courseDetailsWithUserReview = {
+            ...courseDetails.toObject(),
+            reviews: userReview
+        };
+
         // step-2: if no progress found,return courseDetails with an empty progress
         if(!courseProgress){
             return res.status(200).json({
                 data:{
-                    courseDetails,
+                    courseDetails: courseDetailsWithUserReview, // Use filtered version
                     progress:[],
                     completed:false
                 }
@@ -28,20 +47,16 @@ export const getCourseProgress = async (req, res) => {
         // step-3: if progress found,return courseDetails with progress
         return res.status(200).json({
             data:{
-                courseDetails,
+                courseDetails: courseDetailsWithUserReview, // Use filtered version
                 progress:courseProgress.lectureProgress,
                 completed:courseProgress.completed,
-
             }
         });
 
     } catch (error) {
         console.error("Error fetching course progress:", error);
         res.status(500).json({ message: "Internal server error" });
-        
     }
-
-
 }
 
 
