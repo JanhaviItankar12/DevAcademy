@@ -47,17 +47,13 @@ const Navbar = () => {
     const logoutHandler = async () => {
         try {
             await loggedOutUser().unwrap();
-
-            //  Frontend cleanup
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
             dispatch(userLoggedOut());
-            navigate("/login", { state: { tab: "login" } });
+            navigate("/login");
         } catch (error) {
             console.error("Logout failed", error);
         }
     };
+
 
     return (
         <>

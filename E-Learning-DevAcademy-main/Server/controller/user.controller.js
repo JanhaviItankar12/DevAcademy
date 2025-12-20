@@ -215,21 +215,26 @@ export const login = async (req, res) => {
 };
 
 
-export const logout = async (_, res) => {
+export const logout = async (req, res) => {
   try {
-    return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-      message: "Logged out Successfully",
-      success: true
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,      // REQUIRED on Vercel/Render
+      sameSite: "none",  // REQUIRED for cross-site
+    });
 
+    return res.status(200).json({
+      message: "Logged out Successfully",
+      success: true,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
-      message: "Failed to Logout"
+      message: "Failed to Logout",
     });
   }
-}
+};
+
 
 
 //forogt-password
