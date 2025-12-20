@@ -27,11 +27,7 @@ export default function Courses() {
 
     // Handle enrollment
     const handleEnrollment = (courseId) => {
-        if (!user) {
-            navigate("/login");
-        } else {
-            navigate(`/course-detail/${courseId}`);
-        }
+       navigate(`/course-detail/${courseId}`);
     };
 
 
