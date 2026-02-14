@@ -5,6 +5,10 @@ DevAcademy is a full-stack EdTech platform built using the MERN stack, focused o
 🌐 Live Website: [https://devacademy-silk.vercel.app]
 📂 GitHub: This repository
 
+You can explore admin portal through this credentials
+email-devacademy122025@gmail.com
+credential-devAcademy@#25
+
 🚀 Features
 
 Role-based access: Admin | Instructor | Student
