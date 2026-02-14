@@ -6,7 +6,7 @@ DevAcademy is a full-stack EdTech platform built using the MERN stack, focused o
 📂 GitHub: This repository
 
 You can explore admin portal through this credentials
-email-devacademy122025@gmail.com
+devacademy122025@gmail.com
 credential-devAcademy@#25
 
 🚀 Features
