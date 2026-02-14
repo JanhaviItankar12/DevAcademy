@@ -37,4 +37,44 @@ Media management with Cloudinary
 
 MERN | ShadCn UI | MongoDB | Brevo | Razorpay | Cloudinary | Google OAuth
 
+## 🏗 System Architecture
+
+Client (React + ShadCn UI)
+        ↓
+Express.js REST API
+        ↓
+MongoDB Database
+        ↓
+External Services:
+- Razorpay (Payments)
+- Brevo (Emails)
+- Cloudinary (Media Storage)
+- Google OAuth (Authentication)
+
+## 🗄 Database Design
+
+- User Schema (Role-based: Admin | Instructor | Student)
+- Course Schema (Modules, Progress Tracking)
+- Payment Schema (Transaction ID, Status Verification)
+- Certificate Schema (Auto-generated on completion)
+- Notification Preferences Schema
+
+
+## 🔐 Security Features
+
+- JWT-based authentication
+- Bcrypt password hashing
+- Secure password reset with rate limiting
+- IP-based request protection
+- Payment verification via Razorpay signature validation
+- Role-based route protection (Admin / Instructor / Student)
+
+## 🌍 Deployment
+
+- Frontend deployed on Vercel
+- Backend hosted on Render.
+- Environment variables secured
+- Production build optimization
+
+
 ⭐ Feedback & suggestions are welcome!
