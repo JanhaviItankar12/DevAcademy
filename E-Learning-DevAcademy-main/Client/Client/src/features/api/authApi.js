@@ -247,6 +247,7 @@ export const {
     useGenerateCertificateMutation,
     useGetCompletedCoursesQuery,
     useDownloadCertificateQuery,
+    useLazyDownloadCertificateQuery,
     useCreateMessageMutation,
     useAllInstructorsQuery,
     useFollowInstructorsMutation,

@@ -24,7 +24,7 @@ import {
 import { toast } from 'sonner';
 import { useCompleteCourseMutation, useGetCourseProgressQuery, useIncompleteCourseMutation, useUpdateLectureProgressMutation } from '@/features/api/courseProgressApi';
 import { useAddReviewsMutation, useDeleteReviewsMutation, useUpdateReviewsMutation } from '@/features/api/courseApi';
-import { useGenerateCertificateMutation, useGetCurrentUserQuery } from '@/features/api/authApi';
+import { useDownloadCertificateQuery, useGenerateCertificateMutation, useGetCurrentUserQuery, useLazyDownloadCertificateQuery } from '@/features/api/authApi';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 const CourseProgress = () => {
@@ -57,6 +57,9 @@ const CourseProgress = () => {
 
     // Generate certificate mutation...
     const [generateCertificate, { isLoading: isGeneratingCertificate }] = useGenerateCertificateMutation();
+    
+    const [downloadCertificate]=useLazyDownloadCertificateQuery();
+
 
     // Existing state...
     const [currentLecture, setCurrentLecture] = useState(null);
@@ -77,7 +80,7 @@ const autoSaveInterval = useRef(null);
 
     // Certificate state...
     const [showCertificateOptions, setShowCertificateOptions] = useState(false);
-    const [certificateUrl, setCertificateUrl] = useState('');
+    const [certificateId, setCertificateId] = useState('');
 
     // Sidebar collapse state...
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -396,8 +399,8 @@ const handleSeeking = (e) => {
         try {
             const response = await generateCertificate(courseId).unwrap();
 
-            if (response?.success && response?.certificate?.url) {
-                setCertificateUrl(response.certificate.url);
+            if (response?.success && response?.certificate?.certificateId) {
+                setCertificateId(response?.certificate?.certificateId);
                 setShowCertificateOptions(true);
                 toast.success("Certificate generated successfully!");
             } else {
@@ -410,25 +413,38 @@ const handleSeeking = (e) => {
     };
 
     // Handle certificate download...
-    const handleDownloadCertificate = () => {
-        if (!certificateUrl) return;
+ const handleDownloadCertificate = async () => {
+  try {
+    const result = await downloadCertificate(certificateId).unwrap();
 
-        const link = document.createElement('a');
-        link.href = certificateUrl;
-        const fileName = `${courseTitle.replace(/\s+/g, '_')}_Certificate_${Date.now()}.pdf`;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setShowCertificateOptions(false);
-        toast.success("Certificate download started!");
-    };
+    const url = window.URL.createObjectURL(result);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${courseTitle.replace(/\s+/g, "_")}_Certificate.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("Certificate downloaded!");
+
+  } catch (error) {
+    toast.error("Download failed");
+  }
+};
+
 
     // Handle view certificate in new tab...
-    const handleViewCertificate = () => {
-        if (!certificateUrl) return;
-        window.open(certificateUrl, '_blank');
-    };
+    const handleViewCertificate = async () => {
+  try {
+    const result = await downloadCertificate(certificateId).unwrap();
+    const url = window.URL.createObjectURL(result);
+    window.open(url, "_blank");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
     // Render star rating...
     const renderStars = (rating, interactive = false, size = 20, onStarClick = null, onHover = null, onLeave = null) => {
