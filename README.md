@@ -83,21 +83,21 @@ External Services:
 
 
 ### 🏠 Course_Details
-![Course Details](Screenshots/CourseDetailsPage.png)
-![Course Video](Screenshots/Course_Video_page.png)
-![Certificate](Screenshots/Certificate.png)
+![Course Details](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/CourseDetailsPage.png)
+![Course Video](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/Course_Video_page.png)
+![Certificate](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/Certificate.png)
 
 ### 📊Student Dashboard
-![Dashboard](Screenshots/student_dashboard.png)
-![Analytics](Screenshots/student_analytics.png)
+![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_dashboard.png)
+![Analytics](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_analytics.png)
 
 ### 📊Instructor Dashboard
-![Dashboard](Screenshots/instructor_dashboard.png)
-![Analytics](Screenshots/instructor_analytics.png)
+![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/instructor_dashboard.png)
+![Analytics](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/instructor_analytics.png)
 
 ### 📊Admin Dashboard
-![Dashboard](Screenshots/AdminDashboard.png)
-![Top Selling Courses](Screenshots/TopSelling_Courses.png)
+![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/AdminDashboard.png)
+![Top Selling Courses](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/TopSelling_Courses.png)
 
 
 
