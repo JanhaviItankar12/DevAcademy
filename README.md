@@ -76,5 +76,28 @@ External Services:
 - Environment variables secured
 - Production build optimization
 
+  ## 📸 Screenshots
+
+### 🏠 Homepage
+![Homepage](Screenshots/HomePage.png)
+
+### 🏠 Course_Details
+![Course Details](Screenshots/CourseDetailsPage.png)
+![Course Video](Screenshots/Course_Video_page.png)
+![Certificate](Screenshots/Certificate.png)
+
+### 📊Student Dashboard
+![Dashboard](Screenshots/student_dashboard.png)
+![Analytics](Screenshots/student_analytics.png)
+
+### 📊Instructor Dashboard
+![Dashboard](Screenshots/instructor_dashboard.png)
+![Analytics](Screenshots/instructor_analytics.png)
+
+### 📊Admin Dashboard
+![Dashboard](Screenshots/AdminDashboard.png)
+![Top Selling Courses](Screenshots/TopSelling_Courses.png)
+
+
 
 ⭐ Feedback & suggestions are welcome!
