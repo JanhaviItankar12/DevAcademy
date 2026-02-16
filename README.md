@@ -79,7 +79,8 @@ External Services:
   ## 📸 Screenshots
 
 ### 🏠 Homepage
-![Homepage](Screenshots/HomePage.png)
+![Homepage](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/homepage.png)
+
 
 ### 🏠 Course_Details
 ![Course Details](Screenshots/CourseDetailsPage.png)
