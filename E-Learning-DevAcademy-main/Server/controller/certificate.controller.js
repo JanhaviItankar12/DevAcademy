@@ -77,8 +77,8 @@ export const issueCertificate = async (req, res) => {
       success: true,
       message: "Certificate issued successfully!",
       certificate: {
-    certificateId: certificate.certificateId
-  }
+        certificateId: certificate.certificateId
+      }
     });
   } catch (err) {
     console.log(err);
@@ -110,15 +110,15 @@ export const downloadCertificate = async (req, res) => {
     );
 
     if (!certificate) return res.status(404).json({ message: "Certificate not found!" });
-const filePath = path.join(
-  process.cwd(),
-  "Server",
-  "uploads",
-  "certificates",
-  `${certificateId}.pdf`
-);
+    const filePath = path.join(
+      process.cwd(),
+      "Server",
+      "uploads",
+      "certificates",
+      `${certificateId}.pdf`
+    );
 
-    
+
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "Certificate file not found on server!" });
