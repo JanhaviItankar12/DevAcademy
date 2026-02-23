@@ -211,7 +211,7 @@ export const togglePublishCourse = async (req, res) => {
         await course.save();
 
         //  SEND EMAIL NOTIFICATIONS
-        
+
         if (publish === "true") {
             const instructorId = course.creator._id;
 
@@ -325,14 +325,14 @@ export const getPublishedCourses = async (req, res) => {
 
         let enrolledCourseIds = [];
 
-        
+
 
         if (req.id) {
             const user = await User.findById(req.id).select("enrolledCourses");
             enrolledCourseIds = user?.enrolledCourses.map(id => id.toString()) || [];
         }
 
-        
+
 
         const formattedCourses = courses.map(course => {
             const reviewCount = course.reviews.length;
@@ -355,12 +355,12 @@ export const getPublishedCourses = async (req, res) => {
                     name: course.creator?.name,
                     photoUrl: course.creator?.photoUrl
                 },
-                enrolledStudents:course.enrolledStudents.length,
-                category:course.category
+                enrolledStudents: course.enrolledStudents.length,
+                category: course.category
             };
         });
 
-        
+
 
         res.status(200).json({ courses: formattedCourses });
 
@@ -433,7 +433,7 @@ export const getPublishedCourseForHome = async (req, res) => {
                 courseLevel: course.courseLevel,
                 coursePrice: course.coursePrice,
                 courseThumbnail: course.courseThumbnail,
-                
+
                 enrolledStudents: course.enrolledStudents.length,
                 lectures: course.lectures.length,
 
@@ -484,7 +484,12 @@ export const getDataforHeroSection = async (req, res) => {
 
         courses.forEach(course => {
             const enrolledCount = course.enrolledStudents?.length || 0;
-            const completedCount = course.completions?.length || 0;
+
+            // Prevent invalid data
+            const completedCount = Math.min(
+                course.completions?.length || 0,
+                enrolledCount
+            );
 
             totalEnrolled += enrolledCount;
             totalCompleted += completedCount;

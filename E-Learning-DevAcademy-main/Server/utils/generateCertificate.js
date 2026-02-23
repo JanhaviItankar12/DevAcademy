@@ -33,7 +33,9 @@ export const generateCertificate = async (
       const filePath = path.join(dirPath, `${certificateId}.pdf`);
 
       // Convert SVG to PNG for PDF compatibility
-      const logoSvgPath = path.join(__dirname, "public", "logo.svg");
+      const logoSvgPath = path.join(process.cwd(), "Server", "public", "logo.svg");
+      console.log("Logo Path:", logoSvgPath);
+console.log("Logo Exists:", fs.existsSync(logoSvgPath));
       const logoPngPath = path.join(dirPath, "temp-logo.png");
 
       let logoExists = false;
@@ -168,7 +170,9 @@ export const generateCertificate = async (
       const signX = pageWidth - 270;
 
       // Signature image
-      const signPath = path.join(__dirname, "public", "sign.png");
+      const signPath = path.join(process.cwd(), "Server", "public", "sign.png");
+console.log("Sign Path:", signPath);
+console.log("Sign Exists:", fs.existsSync(signPath));
       if (fs.existsSync(signPath)) {
         doc.image(signPath, signX + 15, bottomY - 30, { width: 130, height: 40 });
       }
