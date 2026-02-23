@@ -89,7 +89,7 @@ External Services:
 
 ### 📊Student Dashboard
 ![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_dashboard.png)
-![Analytics](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_analytics.png)
+![Analytics](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_analytics2.png)
 
 ### 📊Instructor Dashboard
 ![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/instructor_dashboard.png)
