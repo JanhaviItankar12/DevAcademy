@@ -76,5 +76,29 @@ External Services:
 - Environment variables secured
 - Production build optimization
 
+  ## 📸 Screenshots
+
+### 🏠 Homepage
+![Homepage](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/HomePage.png)
+
+
+### 🏠 Course_Details
+![Course Details](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/CourseDetailsPage.png)
+![Course Video](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/Course_Video_page.png)
+![Certificate](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/Certificate.png)
+
+### 📊Student Dashboard
+![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_dashboard.png)
+![Analytics](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/student_analytics.png)
+
+### 📊Instructor Dashboard
+![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/instructor_dashboard.png)
+![Analytics](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/instructor_analytics.png)
+
+### 📊Admin Dashboard
+![Dashboard](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/AdminDashboard.png)
+![Top Selling Courses](E-Learning-DevAcademy-main/Client/Client/public/Screenshots/TopSelling_Courses.png)
+
+
 
 ⭐ Feedback & suggestions are welcome!
